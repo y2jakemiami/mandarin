@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+
+    <script src="js/redirect.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>ChineseAI — Интерактивное обучение</title>
+    
+    <!-- Tailwind CSS with Dark Mode -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa',
+                            300: '#fdba74', 400: '#fb923c', 500: '#f97316',
+                            600: '#ea580c', 700: '#c2410c',
+                        },
+                        dark: {
+                            bg: '#0f172a',
+                            surface: '#1e293b',
+                            surface2: '#334155',
+                            text: '#f1f5f9',
+                            textMuted: '#94a3b8',
+                            border: '#475569',
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'slide-in': 'slideIn 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(0)' },
+                        }
+                    },
+                    screens: {
+                        'xs': '480px',
+                        'tablet': {'min': '768px', 'max': '1023px'},
+                        'laptop': {'min': '1024px', 'max': '1279px'},
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* === CSS Variables for Theming === */
+        :root {
+            /* Light theme */
+
+            --loading-gradient: linear-gradient(135deg, #FFB74D 0%, #FF9800 30%, #FFB74D 60%, #FF9800 100%);
+            --bg-primary: linear-gradient(135deg, #fafafa 0%, #f1f5f9 100%);
+            --bg-surface: rgba(255, 255, 255, 0.85);
+            --bg-surface-hover: rgba(255, 255, 255, 0.95);
+            --text-primary: #191919;
+            --text-secondary: #676767;
+            --text-muted: #787878;
+            --border-color: rgba(255, 255, 255, 0.3);
+            --border-subtle: rgba(226, 232, 240, 0.6);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(248, 250, 252, 0.5);
+            --skeleton-base: #f1f5f9;
+            --skeleton-highlight: #e2e8f0;
+            --sidebar-bg: rgba(255, 255, 255, 0.9);
+            --overlay-bg: rgba(0, 0, 0, 0.4);
+            --glass-blur: blur(12px);
+        }
+
+        .dark {
+            /* Dark theme */
+
+            --loading-gradient: linear-gradient(135deg, #1C1C1E 0%, #303030 30%, #1C1C1E 60%, #2C2C2E 100%);
+            --bg-primary: linear-gradient(135deg, #151515 0%, #353535 100%);
+            --bg-surface: rgb(51 51 51 / 85%);
+            --bg-surface-hover: rgb(29 29 29 / 95%);
+            --text-primary: #f1f5f9;
+            --text-secondary: #bfbfbf;
+            --text-muted: #818181;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-subtle: rgb(88 88 88 / 60%);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --input-bg: rgb(80 80 80 / 50%);
+            --skeleton-base: #3a3a3a;
+            --skeleton-highlight: #4d4d4d;
+            --sidebar-bg: rgb(31 31 31 / 90%);
+            --overlay-bg: rgba(0, 0, 0, 0.6);
+            --glass-blur: blur(12px);
+        }
+
+        html { font-size: 16px; scroll-behavior: smooth; }
+        @media (max-width: 1023px) { html { font-size: 15px; } }
+        @media (max-width: 767px) { html { font-size: 14px; } }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* === Theme Transition === */
+        *, *::before, *::after {
+            transition: background-color 0s ease, border-color 0s ease, 
+                       color 0s ease, box-shadow 0s ease, transform 0s ease;
+        }
+
+        /* === Enhanced Scrollbar === */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--text-muted); 
+            border-radius: 3px;
+            opacity: 0.5;
+        }
+        ::-webkit-scrollbar-thumb:hover { opacity: 1; }
+
+        /* Logo */
+        #logo_main {
+            background-image: url(../addons/logo_%231.png);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* === Glassmorphism Cards === */
+        .glass-card {
+            background: var(--bg-surface);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: rgba(249, 115, 22, 0.4);
+            background: var(--bg-surface-hover);
+        }
+        @media (hover: none) {
+            .glass-card:hover { transform: none; }
+        }
+
+        /* === Animated Tab Indicator === */
+        .tab-indicator {
+            position: absolute;
+            bottom: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #f97316, #ea580c);
+            border-radius: 3px 3px 0 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: width, left;
+        }
+
+        /* === Topic Card === */
+        .topic-card {
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #f97316, #fb923c, #fdba74);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        .topic-card:hover::before { transform: scaleX(1); }
+        .topic-card .icon-wrapper { 
+            transition: all 0.3s ease;
+            background: var(--input-bg);
+        }
+        .topic-card:hover .icon-wrapper {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* === Floating Animation === */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .floating { animation: float 3s ease-in-out infinite; }
+
+        /* === Skeleton Loading === */
+        .skeleton {
+            background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-highlight) 50%, var(--skeleton-base) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 0.75rem;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* === Button Ripple === */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            border-radius: inherit;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            transform: scale(0);
+            transition: transform 0.5s ease;
+            pointer-events: none;
+        }
+        .btn-ripple:active::after {
+            transform: scale(3);
+            transition: transform 0s;
+        }
+
+        /* === Focus States === */
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 2px solid #f97316;
+            outline-offset: 2px;
+        }
+
+        /* === Mobile Safe Area === */
+        @supports (padding: max(0px)) {
+            .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+            .pt-safe { padding-top: max(0px, env(safe-area-inset-top)); }
+        }
+
+        /* === Tablet-Optimized Layout === */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            aside { width: 288px; }
+            header { padding-left: calc(288px + 1rem); }
+            #topicList { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            @media (orientation: landscape) {
+                #topicList { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            }
+        }
+
+        /* === Sidebar Overlay === */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay-bg);
+            backdrop-filter: blur(4px);
+            z-index: 25;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* === Collapsible Sidebar === */
+        @media (max-width: 1023px) {
+            aside {
+                position: fixed;
+                left: 0; top: 0; height: 100vh;
+                z-index: 40;
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background: var(--sidebar-bg);
+            }
+            aside.active { transform: translateX(0); }
+            header { padding-left: 1rem !important; }
+            main { margin-left: 0 !important; }
+        }
+
+        /* === Touch Optimization === */
+        @media (hover: none) and (pointer: coarse) {
+            .topic-card, .nav-item, button {
+                -webkit-tap-highlight-color: transparent;
+            }
+            input, select { font-size: 16px !important; }
+        }
+
+        #hskkSelect {
+            width: 10rem;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            padding-left: 0.75rem;
+        }
+
+        /* === Theme Toggle Button === */
+        .theme-toggle {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--input-bg);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .theme-toggle:hover {
+            background: var(--bg-surface-hover);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle .sun-icon { opacity: 1; transform: rotate(0) scale(1); }
+        .theme-toggle .moon-icon { opacity: 0; transform: rotate(-90deg) scale(0.8); position: absolute; }
+        
+        .dark .theme-toggle .sun-icon { opacity: 0; transform: rotate(90deg) scale(0.8); }
+        .dark .theme-toggle .moon-icon { opacity: 1; transform: rotate(0) scale(1); }
+
+        /* === Print Styles === */
+        @media print {
+            aside, header, nav, .floating, .theme-toggle { display: none !important; }
+            main { overflow: visible !important; }
+            .glass-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body class="h-screen w-full overflow-hidden flex flex-col md:flex-row">
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay md:hidden" aria-hidden="true"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="hidden md:flex flex-col w-72 h-full border-r z-30" style="background: var(--sidebar-bg); border-color: var(--border-subtle);">
+        <!-- Logo + Theme Toggle -->
+        <div class="p-5 md:p-6 flex items-center justify-between border-b" style="border-color: var(--border-subtle);">
+            <div class="flex items-center gap-3">
+                <div class="relative flex-shrink-0">
+                    <div id='logo_main' class="w-10 h-10 md:w-11 md:h-11 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center text-white shadow-[0_0_20px_0_rgba(var(--color-primary-500),0.6)] shadow-primary-500/100"></div>
+                </div>
+                <div class="min-w-0">
+                    <span class="text-lg md:text-xl font-bold tracking-tight">Mandarin.<span class="text-primary-500">AI</span></span>
+                    <p class="text-xs opacity-60 -mt-0.5 hidden sm:block">Real-Qwest-Talk</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 px-2 md:px-3 py-3 md:py-4 space-y-1 md:space-y-1.5 overflow-y-auto">
+            <a href="#" class="nav-item active flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl font-medium transition-all group" style="color: var(--text-primary); background: rgba(249, 115, 22, 0.1);">
+                <div class="relative flex-shrink-0">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <span class="truncate">Чаты</span>
+            </a>
+            
+            <a href="achievements_desktop.html" class="nav-item flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl font-medium transition-all opacity-70 hover:opacity-100" style="color: var(--text-secondary);">
+                <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                <span class="truncate">Достижения</span>
+            </a>
+            
+            <a href="profile_desktop.html" class="nav-item flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl font-medium transition-all opacity-70 hover:opacity-100" style="color: var(--text-secondary);">
+                <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="truncate">Профиль</span>
+            </a>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="p-3 md:p-4 border-t" style="border-color: var(--border-subtle);">
+            <div class="glass-card rounded-xl md:rounded-2xl p-2.5 md:p-3 flex items-center gap-3 cursor-pointer" style="background: var(--input-bg);">
+                <div class="relative flex-shrink-0" id="avatarDisplay">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md">U</div>
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 md:w-3 md:h-3 bg-green-400 rounded-full border-2 border-white"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p id='userId' class="text-sm font-semibold truncate" style="color: var(--text-primary);">Пользователь</p>
+                    <span id='userXp' class="text-xs opacity-60">1,250 XP</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="border-b px-3 md:px-6 lg:px-8 py-3 md:py-4 flex items-center justify-between sticky top-0 z-20" style="background: var(--bg-surface); border-color: var(--border-subtle); backdrop-filter: var(--glass-blur);">
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="menuToggle" class="md:hidden p-2.5 rounded-xl transition-colors" style="color: var(--text-secondary);" aria-label="Меню" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+
+            <!-- Search & Filter -->
+            <div class="flex-1 max-w-5xl mx-auto flex flex-col xs:flex-row gap-2.5 md:gap-3 items-stretch xs:items-center">
+                
+                <!-- Search -->
+                <div class="relative w-full xs:w-auto xs:flex-1 group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 opacity-50 group-focus-within:text-primary-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    </div>
+                    <input type="text" id="searchInput" 
+                        class="block w-full pl-11 pr-4 py-2.5 md:py-3 border rounded-xl md:rounded-2xl placeholder-opacity-50
+                               focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 
+                               transition-all text-sm" 
+                        style="background: var(--input-bg); border-color: var(--border-subtle); color: var(--text-primary);"
+                        placeholder="Поиск тем...">
+                    <kbd class="hidden lg:inline-flex absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs opacity-50 rounded-md border" style="background: var(--bg-surface); border-color: var(--border-subtle);">⌘K</kbd>
+                </div>
+
+                <!-- Filter -->
+                <div class="relative w-full xs:w-auto">
+                    <select id="hskkSelect" 
+                        class="appearance-none w-full xs:w-48 md:w-52 border rounded-xl md:rounded-2xl
+                               focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-400 
+                               cursor-pointer text-sm font-medium shadow-sm transition-all"
+                        style="background: var(--input-bg); border-color: var(--border-subtle); color: var(--text-primary);">
+                        <option value="all">Все уровни</option>
+                        <option value="1">HSKK 1</option>
+                        <option value="2">HSKK 2</option>
+                        <option value="3">HSKK 3</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 opacity-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats (Desktop/Tablet) -->
+            <div class="hidden md:flex items-center gap-2 lg:gap-3 ml-2 lg:ml-4">
+                <div class="flex items-center gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-lg lg:rounded-xl text-xs font-semibold backdrop-blur-sm" style="background: rgba(99, 102, 241, 0.1); border: 1px solid var(--border-subtle); color: #818cf8;">
+                    <img width="14" height="14" src="assets/icons/icons8-флаг-2-32(1).png" alt="" onerror="this.style.display='none'" class="hidden sm:block"/>
+                    <span id="hsk_level_item" class="tracking-wide">HSKK 2</span>
+                </div>
+                <div class="flex items-center gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-lg lg:rounded-xl text-xs font-semibold backdrop-blur-sm" style="background: rgba(249, 115, 22, 0.1); border: 1px solid var(--border-subtle); color: #fb923c;">
+                    <svg class="w-3.5 h-3.5 lg:w-4 lg:h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    <span id="xp_level_item">1,250 XP</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <div class="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 scroll-smooth">
+            <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
+
+                <!-- Tabs + Free Chat -->
+                <div class="flex flex-col xs:flex-row xs:items-center justify-between gap-3 md:gap-4 pb-1">
+                    <!-- Tabs -->
+                    <div class="relative inline-flex gap-1 p-1 rounded-xl md:rounded-2xl" style="background: var(--input-bg);">
+                        <button class="tab-btn relative px-4 md:px-6 py-2 md:py-2.5 text-xs md:text-sm font-semibold tracking-wide rounded-lg md:rounded-xl transition-all z-10" data-tab="custom">
+                            <span class="relative z-10">Мои темы</span>
+                        </button>
+                        <button class="tab-btn relative px-4 md:px-6 py-2 md:py-2.5 text-xs md:text-sm font-semibold tracking-wide rounded-lg md:rounded-xl transition-all opacity-60 hover:opacity-100 z-10" data-tab="all">
+                            <span class="relative z-10">Все темы</span>
+                        </button>
+                        <div class="tab-indicator" style="width: calc(50% - 4px); left: 2px;"></div>
+                    </div>
+                    
+                    <!-- Free Chat Button -->
+                    <button id="freeChatCard" class="hidden xs:flex items-center justify-center gap-2 bg-gradient-to-r from-primary-500 to-orange-500 hover:from-primary-600 hover:to-orange-600 text-white px-4 md:px-5 py-2 md:py-2.5 rounded-xl md:rounded-2xl shadow-lg shadow-primary-500/25 transition-all transform hover:scale-[1.02] active:scale-[0.98] btn-ripple group">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span class="font-semibold text-xs md:text-sm whitespace-nowrap">Свободный диалог</span>
+                        <span class="ml-1 px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs bg-white/20 rounded-full">AI</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Free Chat -->
+                <div class="xs:hidden mb-4 md:mb-6">
+                    <div id="freeChatCardMobile" class="glass-card flex items-center justify-center gap-3 p-4 rounded-2xl cursor-pointer active:scale-[0.98] transition-transform floating">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-400 to-orange-500 flex items-center justify-center text-white shadow-md flex-shrink-0">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <span class="font-bold" style="color: var(--text-primary);">Свободный диалог</span>
+                        <svg class="w-5 h-5 opacity-40 ml-auto flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </div>
+                </div>
+
+                <!-- Topics Grid -->
+                <div id="topicList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 pb-20 md:pb-24">
+                    <!-- Skeleton Loading -->
+                    <div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-5 animate-pulse">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl skeleton"></div>
+                            <div class="w-14 h-5 md:w-16 md:h-6 rounded-full skeleton"></div>
+                        </div>
+                        <div class="h-4 md:h-5 w-3/4 rounded skeleton mb-2 opacity-60"></div>
+                        <div class="h-3 md:h-4 w-full rounded skeleton mb-1 opacity-60"></div>
+                        <div class="h-3 md:h-4 w-2/3 rounded skeleton opacity-60"></div>
+                    </div>
+                    <div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-5 animate-pulse" style="animation-delay: 100ms"></div>
+                    <div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-5 animate-pulse" style="animation-delay: 200ms"></div>
+                    <div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-5 animate-pulse" style="animation-delay: 300ms"></div>
+                </div>
+
+                <!-- No Results -->
+                <div id="noResults" class="hidden col-span-full text-center py-12 md:py-16">
+                    <div class="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-3xl mb-4 md:mb-5 shadow-inner" style="background: var(--input-bg);">
+                        <svg class="w-8 h-8 md:w-10 md:h-10 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="text-base md:text-lg font-semibold">Ничего не найдено</h3>
+                    <p class="text-sm md:text-base opacity-60 mt-1.5 max-w-sm mx-auto px-4">Попробуйте изменить поисковый запрос или выбрать другой уровень</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV (Mobile) -->
+        <nav class="md:hidden fixed bottom-0 w-full border-t flex justify-around py-2 px-2 z-30 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.06)]" style="background: var(--bg-surface); border-color: var(--border-subtle); backdrop-filter: var(--glass-blur);">
+            <a href="achievements.html" class="nav-item flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl transition-colors opacity-60 hover:opacity-100">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                <span class="text-[10px] font-medium">Награды</span>
+            </a>
+            <a href="index.html" class="nav-item active flex flex-col items-center gap-1 py-1.5 px-3">
+                <div class="relative">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary-500 rounded-full border-2 border-white"></span>
+                </div>
+                <span class="text-[10px] font-semibold" style="color: var(--text-primary);">Чаты</span>
+            </a>
+            <a href="profile.html" class="nav-item flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl transition-colors opacity-60 hover:opacity-100">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="text-[10px] font-medium">Профиль</span>
+            </a>
+        </nav>
+
+        <!-- Floating Action Button (Mobile) -->
+        <button class="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-gradient-to-br from-primary-500 to-orange-500 text-white rounded-full shadow-xl shadow-primary-500/30 flex items-center justify-center z-20 hover:scale-105 active:scale-95 transition-transform btn-ripple" aria-label="Новый чат">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+        </button>
+
+    </main>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // === CONFIGURATION ===
+        const API_HOST = window.API_HOST || 'localhost';
+        const API_URL = `http://${API_HOST}:8002`;
+        const SETTINGS_KEY = 'ai_chinese_settings';
+        const THEME_KEY = 'chinese_ai_theme';
+        const DEFAULT_SETTINGS = { avatar: 'girl', theme: 'light', aiLanguage: 'ru' };
+
+        // === STATE ===
+        let topicsData = [];
+        let currentTab = 'custom';
+        let currentSearch = '';
+        let currentHskkFilter = 'all';
+        let sidebarOpen = false;
+
+        // === DOM ELEMENTS ===
+        const searchInput = document.getElementById('searchInput');
+        const hskkSelect = document.getElementById('hskkSelect');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabIndicator = document.querySelector('.tab-indicator');
+        const topicList = document.getElementById('topicList');
+        const noResults = document.getElementById('noResults');
+        const freeChatCard = document.getElementById('freeChatCard');
+        const freeChatCardMobile = document.getElementById('freeChatCardMobile');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const menuToggle = document.getElementById('menuToggle');
+        const themeToggle = document.getElementById('themeToggle');
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem(THEME_KEY, theme);
+        }
+
+        // === THEME MANAGEMENT ===
+        function initTheme() {
+            
+            const settings = loadSettings();
+            applyTheme(settings.theme);
+            
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const newTheme = isDark ? 'light' : 'dark';
+            applyTheme(newTheme);
+        }
+
+        function updateUserMini(profile) {
+            const name = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Пользователь';
+            document.getElementById('userId').textContent = name;
+            document.getElementById('userXp').textContent = (profile.xp || 0).toLocaleString() + ' XP';
+            if (profile.avatar_url && document.getElementById('avatarDisplay')) {
+                const avatar = document.getElementById('avatarDisplay').querySelector('div');
+                if (avatar) {
+                    avatar.innerHTML = `<img src="${profile.avatar_url.startsWith('http') ? profile.avatar_url : '../backend/' + profile.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+                }
+            }
+        }
+
+        // === SETTINGS ===
+        function loadSettings() {
+            try {
+                const stored = localStorage.getItem(SETTINGS_KEY);
+                return stored ? { ...DEFAULT_SETTINGS, ...JSON.parse(stored) } : { ...DEFAULT_SETTINGS };
+            } catch (e) { return { ...DEFAULT_SETTINGS }; }
+        }
+
+        // === RENDER TOPICS ===
+        function renderTopics() {
+            topicList.innerHTML = '';
+            
+            const filteredData = topicsData.filter(topic => {
+                const matchesSearch = topic.title.toLowerCase().includes(currentSearch.toLowerCase()) || 
+                                      topic.desc.toLowerCase().includes(currentSearch.toLowerCase());
+                const matchesLevel = currentHskkFilter === 'all' || topic.level == currentHskkFilter;
+                return matchesSearch && matchesLevel;
+            });
+
+            if (filteredData.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                
+                filteredData.forEach((topic, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'topic-card glass-card rounded-xl md:rounded-2xl p-4 md:p-5 cursor-pointer group animate-fade-in-up';
+                    card.style.animationDelay = `${index * 60}ms`;
+
+                    const defaultIcon = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z";
+                    const iconPath = topic.icon_path || defaultIcon;
+
+                    const levelConfig = {
+                        1: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400', label: 'HSKK 1' },
+                        2: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400', label: 'HSKK 2' },
+                        3: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-400', label: 'HSKK 3' }
+                    };
+                    const level = levelConfig[topic.level] || levelConfig[1];
+
+                    const progressHTML = topic.progress !== undefined ? `
+                        <div class="mt-3 pt-3 border-t" style="border-color: var(--border-subtle);">
+                            <div class="flex items-center justify-between text-xs mb-1.5">
+                                <span class="opacity-60">Прогресс</span>
+                                <span class="font-medium">${topic.progress}%</span>
+                            </div>
+                            <div class="w-full h-1.5 rounded-full overflow-hidden" style="background: var(--input-bg);">
+                                <div class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500" style="width: ${topic.progress}%"></div>
+                            </div>
+                        </div>
+                    ` : '';
+
+                    const completedBadge = topic.progress === 100 ? 
+                        `<span class="absolute top-3 md:top-4 right-3 md:right-4 w-5 h-5 md:w-6 md:h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-[10px] md:text-xs shadow-md">✓</span>` : '';
+
+                    card.innerHTML = `
+                        ${completedBadge}
+                        <div class="flex items-start justify-between mb-3 md:mb-4">
+                            <div class="icon-wrapper w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-300">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="currentColor"><path d="${iconPath}"/></svg>
+                            </div>
+                            <span class="px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg text-[10px] md:text-xs font-bold ${level.bg} ${level.text}">${level.label}</span>
+                        </div>
+                        <h3 class="text-base md:text-lg font-bold mb-1 md:mb-1.5 group-hover:text-primary-500 transition-colors line-clamp-1" style="color: var(--text-primary);">${topic.title}</h3>
+                        <p class="text-xs md:text-sm line-clamp-2 leading-relaxed opacity-60">${topic.desc}</p>
+                        ${progressHTML}
+                        <div class="mt-3 md:mt-4 flex items-center text-primary-500 text-xs md:text-sm font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-8px] group-hover:translate-x-0">
+                            Начать
+                            <svg class="w-3.5 h-3.5 md:w-4 md:h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', () => openChat(topic.title, topic.level, topic.icon_path));
+                    topicList.appendChild(card);
+                });
+            }
+        }
+
+        function updateTabIndicator(btn) {
+            if (!tabIndicator) return;
+            const tabsContainer = btn.parentElement;
+            const btnRect = btn.getBoundingClientRect();
+            const containerRect = tabsContainer.getBoundingClientRect();
+            tabIndicator.style.width = `${btnRect.width - 4}px`;
+            tabIndicator.style.left = `${btnRect.left - containerRect.left + 2}px`;
+        }
+
+        function updateUI() {
+            tabBtns.forEach(btn => {
+                if(btn.dataset.tab === currentTab) {
+                    btn.classList.add('font-semibold');
+                    btn.style.color = 'var(--text-primary)';
+                    btn.style.background = 'var(--bg-surface)';
+                    updateTabIndicator(btn);
+                } else {
+                    btn.classList.remove('font-semibold');
+                    btn.style.color = '';
+                    btn.style.background = '';
+                }
+            });
+            renderTopics();
+        }
+
+        function openChat(topicTitle, hskkLevel, iconPath) {
+            localStorage.setItem('currentTopicData', JSON.stringify({
+                title: topicTitle, level: hskkLevel, icon: iconPath
+            }));
+            const params = new URLSearchParams({ topic: topicTitle, level: hskkLevel });
+            window.location.href = `chat_test.html?${params.toString()}`;
+        }
+
+        // === Sidebar Toggle ===
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            sidebar.classList.toggle('active', sidebarOpen);
+            sidebarOverlay.classList.toggle('active', sidebarOpen);
+            menuToggle.setAttribute('aria-expanded', sidebarOpen);
+            document.body.style.overflow = sidebarOpen ? 'hidden' : '';
+        }
+
+        function closeSidebar() {
+            if (sidebarOpen) {
+                sidebarOpen = false;
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // === DATA LOADING ===
+        async function loadMyTopics() {
+            topicList.innerHTML = Array(4).fill(`
+                <div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-5 animate-pulse">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl skeleton"></div>
+                        <div class="w-14 h-5 md:w-16 md:h-6 rounded-full skeleton"></div>
+                    </div>
+                    <div class="h-4 md:h-5 w-3/4 rounded skeleton mb-2 opacity-60"></div>
+                    <div class="h-3 md:h-4 w-full rounded skeleton mb-1 opacity-60"></div>
+                    <div class="h-3 md:h-4 w-2/3 rounded skeleton opacity-60"></div>
+                </div>
+            `).join('');
+            
+            const userId = localStorage.getItem('currentUserId');
+            if (!userId) {
+                setTimeout(() => { topicsData = mockTopics.slice(0, 4); renderTopics(); }, 500);
+                return;
+            }
+
+            try {
+                const profRes = await fetch(`${API_URL}/profile/${userId}`);
+                if (!profRes.ok) throw new Error('Ошибка профиля');
+                const profile = await profRes.json();
+                
+                let selectedIds = [];
+                if (profile.selected_topics) {
+                    try { selectedIds = JSON.parse(profile.selected_topics); } catch (e) {}
+                }
+
+                if (!selectedIds?.length) {
+                     topicList.innerHTML = `<div class="col-span-full text-center py-12 glass-card rounded-2xl p-6"><p class="opacity-60 mb-4">Вы еще не выбрали темы.</p><a href="topics-choise.html" class="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition">Выбрать темы →</a></div>`;
+                     return;
+                }
+
+                const topicsRes = await fetch(`${API_URL}/topics`);
+                if (!topicsRes.ok) throw new Error('Ошибка загрузки тем');
+                const allTopics = await topicsRes.json();
+                topicsData = allTopics.filter(t => selectedIds.includes(t.id));
+                renderTopics();
+
+            } catch (error) {
+                console.error('API Error:', error);
+                topicsData = mockTopics; 
+                renderTopics();
+            }
+        }
+
+        async function loadAllTopicsPublic() {
+            topicList.innerHTML = `<div class="col-span-full flex justify-center py-10"><div class="w-6 h-6 md:w-8 md:h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div></div>`;
+            try {
+                const response = await fetch(`${API_URL}/topics`);
+                if(!response.ok) throw new Error("API Error");
+                topicsData = await response.json();
+                renderTopics();
+            } catch (error) {
+                console.log("Using mock data");
+                topicsData = mockTopics;
+                renderTopics();
+            }
+        }
+
+        async function loadUserDataHeader() {
+            const userId = localStorage.getItem('currentUserId');
+            document.getElementById('hsk_level_item').textContent = "HSKK 2";
+            document.getElementById('xp_level_item').textContent = "1,250 XP";
+            document.getElementById('userXp').textContent = "1,250 XP";
+
+            if (!userId) return;
+            try {
+                const res = await fetch(`${API_URL}/profile/${userId}`);
+                const data = await res.json();
+                if(document.getElementById('hsk_level_item')) 
+                    document.getElementById('hsk_level_item').textContent = `HSKK ${data.level_hsk}`;
+                if(document.getElementById('xp_level_item')) 
+                    document.getElementById('xp_level_item').textContent = data.xp + " XP";
+                if(document.getElementById('userXp'))
+                    document.getElementById('userXp').textContent = data.xp + " XP";
+                if(document.getElementById('userId'))
+                    document.getElementById('userId').textContent = `${data.first_name || ''} ${data.last_name || ''}`.trim() || 'Пользователь';
+
+                // Avatar
+                if (data.avatar_url) {
+                    const url = data.avatar_url.startsWith('http') ? data.avatar_url : `../backend/${data.avatar_url}`;
+                    updateUserMini(data);
+                    console.log(`../backend/${data.avatar_url}`);
+                }
+                
+            } catch (e) { console.error(e); }
+        }
+
+        // === INITIALIZATION ===
+        function init() {
+            // Initialize theme FIRST
+            initTheme();
+            
+            loadSettings();
+            loadUserDataHeader();
+
+            // Theme toggle
+            if(themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+
+            // Tab switching
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentTab = btn.dataset.tab;
+                    updateUI();
+                    currentTab === 'custom' ? loadMyTopics() : loadAllTopicsPublic();
+                    if (window.innerWidth < 1024) closeSidebar();
+                });
+            });
+
+            setTimeout(() => {
+                const activeBtn = document.querySelector('.tab-btn.active') || tabBtns[0];
+                updateTabIndicator(activeBtn);
+            }, 150);
+
+            // Search with debounce
+            let searchTimeout;
+            if(searchInput) {
+                searchInput.addEventListener('input', e => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        currentSearch = e.target.value;
+                        renderTopics();
+                    }, 250);
+                });
+            }
+
+            // Filter
+            if(hskkSelect) {
+                hskkSelect.addEventListener('change', e => {
+                    currentHskkFilter = e.target.value;
+                    renderTopics();
+                });
+            }
+
+            // Free Chat
+            const handleFreeChat = () => openChat('Свободное общение', 'Any', null);
+            if(freeChatCard) freeChatCard.addEventListener('click', handleFreeChat);
+            if(freeChatCardMobile) freeChatCardMobile.addEventListener('click', handleFreeChat);
+
+            // Sidebar toggle
+            if(menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+            if(sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && sidebarOpen) { closeSidebar(); }
+                if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    searchInput?.focus();
+                }
+                // Optional: T for theme toggle
+                if (e.key.toLowerCase() === 't' && !e.metaKey && !e.ctrlKey && document.activeElement.tagName !== 'INPUT') {
+                    toggleTheme();
+                }
+            });
+
+            // Handle resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (window.innerWidth >= 1024 && sidebarOpen) { closeSidebar(); }
+                }, 150);
+            });
+
+            // Initial load
+            loadMyTopics();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

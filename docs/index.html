@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+    <script src="js/redirect.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover", shrink-to-fit=no>
+    <title>AI Chat Interface - Light Yellow Theme</title>
+    <link rel="stylesheet" href="css/style_index.css">
+</head>
+<body>
+
+    <header>
+        <!-- Обновленная панель прогресса -->
+        <div class="progress-bar-wrapper">
+            <!-- HSK Level -->
+            <div class="progress-item" onclick="window.location.href='test.html'">
+                <div class="progress-icon">
+                    <img width="22" height="22" src="assets/icons/icons8-флаг-2-32(1).png" alt=""/>
+                </div>
+                <span class="progress-text" id="hsk_level_item"></span>
+            </div>
+
+            <!-- XP Points -->
+            <div class="progress-item">
+                <div class="progress-icon">
+                    <img width="22" height="22" src="assets/icons/icons8-apple-arcade-30(1).png" alt=""/>
+                </div>
+                <span class="progress-text" id="xp_level_item"></span>
+            </div>
+
+            <!-- Subscription -->
+            <div class="progress-item pro-style" onclick="window.location.href='profile.html'">
+                <div class="progress-icon">
+                    <img width="22" height="22" src="assets/icons/icons8-font-awesome-32(1).png" alt=""/>
+                </div>
+                <span class="progress-text" id="sub_level_item"></span>
+            </div>
+        </div>
+        <!-- Search Bar -->
+        <div class="search-row">
+            <div class="search-wrapper" id="searchWrapper">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" class="search-input" id="searchInput" placeholder="Поиск темы">
+            </div>
+            
+            <div class="filter-wrapper" id="filterWrapper">
+                <select class="filter-select" id="hskkSelect">
+                    <option value="all">Все уровни</option>
+                    <option value="1">HSKK 1</option>
+                    <option value="2">HSKK 2</option>
+                    <option value="3">HSKK 3</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="custom">Мои темы</button>
+            <button class="tab-btn" data-tab="all">Все темы</button>
+        </div>
+    </header>
+
+    <main id="contentArea">
+        <div id="freeChatSection">
+            <div class="free-chat-card" id="freeChatCard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Свободное общение
+            </div>
+        </div>
+
+        <div class="topic-list" id="topicList">
+            <div class="loading">Загрузка тем...</div>
+        </div>
+        <div class="no-results" id="noResults">Ничего не найдено</div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="achievements.html" class="nav-item" id='achievementsBtn'>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+            <span>Достижения</span>
+        </a>
+        <a href="index.html" class="nav-item active" id='chatsBtn'>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Чаты</span>
+        </a>
+        <a href="profile.html" class="nav-item" id='profileBtn'>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Профиль</span>
+        </a>
+    </nav>
+
+    <script src="./js/client.js"></script>
+
+    <script>
+
+        const API_HOST = window.API_HOST;
+        const API_URL = `http://${API_HOST}:8002`;
+
+        const SETTINGS_KEY = 'ai_chinese_settings';
+        const DEFAULT_SETTINGS = { avatar: 'girl', theme: 'light', aiLanguage: 'ru' };
+
+        // === СОСТОЯНИЕ СТРАНИЦЫ ===
+        let topicsData = [];
+        let currentTab = 'custom'; // 'custom' (мои темы) или 'all' (все темы)
+        let currentSearch = '';
+        let currentHskkFilter = 'all';
+
+        // === DOM ЭЛЕМЕНТЫ ===
+        const searchInput = document.getElementById('searchInput');
+        const searchWrapper = document.getElementById('searchWrapper');
+        const filterWrapper = document.getElementById('filterWrapper');
+        const hskkSelect = document.getElementById('hskkSelect');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const topicList = document.getElementById('topicList');
+        const freeChatSection = document.getElementById('freeChatSection');
+        const noResults = document.getElementById('noResults');
+
+        // === ФУНКЦИИ НАСТРОЕК И ТЕМЫ ===
+        function loadSettings() {
+            try {
+                const stored = localStorage.getItem(SETTINGS_KEY);
+                return stored ? { ...DEFAULT_SETTINGS, ...JSON.parse(stored) } : { ...DEFAULT_SETTINGS };
+            } catch (e) { return { ...DEFAULT_SETTINGS }; }
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'dark') document.body.setAttribute('data-theme', 'dark');
+            else document.body.removeAttribute('data-theme');
+        }
+
+        // === ЛОГИКА ОТОБРАЖЕНИЯ ТЕМ ===
+        function renderTopics() {
+            topicList.innerHTML = '';
+            
+            // Фильтрация по поиску и уровню HSKK
+            const filteredData = topicsData.filter(topic => {
+                const matchesSearch = topic.title.toLowerCase().includes(currentSearch.toLowerCase()) || 
+                                      topic.desc.toLowerCase().includes(currentSearch.toLowerCase());
+                const matchesLevel = currentHskkFilter === 'all' || topic.level == currentHskkFilter;
+                return matchesSearch && matchesLevel;
+            });
+
+            if (filteredData.length === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+                filteredData.forEach(topic => {
+                    const card = document.createElement('div');
+                    card.className = 'topic-card';
+                    // Используем иконку из JSON если она есть, иначе дефолтную
+                    const iconPath = topic.icon_path || "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z";
+                    
+                    card.innerHTML = `
+                        <div class="avatar-box">
+                            <svg viewBox="0 0 24 24"><path d="${iconPath}"/></svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="topic-title">${topic.title}</div>
+                            <div class="topic-desc">${topic.desc}</div>
+                        </div>
+                        <div class="hskk-badge">HSKK ${topic.level}</div>
+                    `;
+                    card.addEventListener('click', () => openChat(topic.title, topic.level, topic.icon_path));
+                    topicList.appendChild(card);
+                });
+            }
+        }
+
+        function updateUI() {
+            if (currentTab === 'all') {
+                freeChatSection.classList.remove('hidden');
+                searchWrapper.classList.add('shrunk');
+                filterWrapper.classList.add('active');
+            } else {
+                searchWrapper.classList.remove('shrunk');
+                filterWrapper.classList.remove('active');
+                currentHskkFilter = 'all';
+                hskkSelect.value = 'all';
+            }
+            renderTopics();
+        }
+
+        function openChat(topicTitle, hskkLevel, iconPath) {
+
+            // Сохраняем данные темы для чата
+            localStorage.setItem('currentTopicData', JSON.stringify({
+                title: topicTitle,
+                level: hskkLevel,
+                icon: iconPath
+            }));
+
+            const params = new URLSearchParams({ topic: topicTitle, level: hskkLevel });
+            window.location.href = `chat_test.html?${params.toString()}`;
+        }
+
+        // === ЗАГРУЗКА ДАННЫХ ===
+        
+        // 1. Загрузка "Моих тем" (персонализированных)
+        async function loadMyTopics() {
+            const userId = localStorage.getItem('currentUserId');
+            if (!userId) window.location.href = 'login.html';
+
+            try {
+                // 1. Получаем профиль, чтобы узнать выбранные ID
+                const profRes = await fetch(`${API_URL}/profile/${userId}`);
+                if (!profRes.ok) throw new Error('Ошибка профиля');
+                const profile = await profRes.json();
+                
+                let selectedIds = [];
+                if (profile.selected_topics) {
+                    try { 
+                        selectedIds = JSON.parse(profile.selected_topics); 
+                    } catch (e) {
+                        console.error('Ошибка парсинга JSON тем', e);
+                    }
+                }
+
+                // Если тем нет, предлагаем выбрать
+                if (!selectedIds || selectedIds.length === 0) {
+                     topicList.innerHTML = `
+                        <div style="text-align:center; padding:40px; color:var(--text-sub)">
+                            <p>Вы еще не выбрали темы.</p>
+                            <a href="topics-choise.html" style="color:var(--accent-red); font-weight:600; margin-top:10px; display:inline-block;">Перейти к выбору тем →</a>
+                        </div>`;
+                     return;
+                }
+
+                // 2. ИСПРАВЛЕНИЕ: Загружаем ВСЕ темы с правильного эндпоинта /topics
+                const topicsRes = await fetch(`${API_URL}/topics`); 
+                if (!topicsRes.ok) throw new Error('Ошибка загрузки списка тем');
+                const allTopics = await topicsRes.json();
+                
+                // 3. Фильтруем: оставляем только те, чьи ID есть в профиле пользователя
+                topicsData = allTopics.filter(t => selectedIds.includes(t.id));
+                
+                console.log(`Загружено ${topicsData.length} тем для пользователя.`); // Для отладки
+                renderTopics();
+
+            } catch (error) {
+                console.error('Ошибка загрузки моих тем:', error);
+                topicList.innerHTML = `<div class="loading" style="color:red">Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        // 2. Загрузка "Всех тем" (публичный список)
+        async function loadAllTopicsPublic() {
+             try {
+                const response = await fetch(`${API_URL}/topics`);
+                topicsData = await response.json();
+                renderTopics();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // 3. Загрузка данных пользователя для шапки (XP, Level)
+        async function loadUserDataHeader() {
+            const userId = localStorage.getItem('currentUserId');
+            if (!userId) return;
+
+            try {
+                const res = await fetch(`${API_URL}/profile/${userId}`);
+                const data = await res.json();
+                
+                if(document.getElementById('hsk_level_item')) 
+                    document.getElementById('hsk_level_item').textContent = `HSKK ${data.level_hsk}`;
+                if(document.getElementById('xp_level_item')) 
+                    document.getElementById('xp_level_item').textContent = data.xp;
+                
+                // Обновление стиля подписки
+                const subEl = document.getElementById('sub_level_item');
+                if (subEl) {
+                    const subType = data.subscription_type || 'start';
+                    subEl.textContent = subType.toUpperCase();
+                    const subCard = subEl.closest('.progress-item');
+                    if (subType === 'premium' || subType === 'pro') {
+                        subCard?.classList.add('pro-style');
+                        subCard?.classList.remove('start-style');
+                    } else {
+                        subCard?.classList.remove('pro-style');
+                        subCard?.classList.add('start-style');
+                    }
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // === ИНИЦИАЛИЗАЦИЯ ===
+        function init() {
+            const settings = loadSettings();
+            applyTheme(settings.theme);
+            
+            // Загружаем данные шапки
+            loadUserDataHeader();
+
+            // Обработчики табов
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTab = btn.dataset.tab;
+                    
+                    // Анимация прозрачности при переключении
+                    topicList.style.opacity = '0.5';
+                    setTimeout(() => { 
+                        updateUI(); 
+                        topicList.style.opacity = '1'; 
+                    }, 150);
+
+                    // Загрузка нужных данных
+                    if (currentTab === 'custom') loadMyTopics();
+                    else loadAllTopicsPublic();
+                });
+            });
+
+            // Поиск
+            if(searchInput) {
+                searchInput.addEventListener('input', e => {
+                    currentSearch = e.target.value;
+                    renderTopics();
+                });
+            }
+
+            // Фильтр HSKK
+            if(hskkSelect) {
+                hskkSelect.addEventListener('change', e => {
+                    currentHskkFilter = e.target.value;
+                    renderTopics();
+                });
+            }
+
+            // Кнопка свободного общения
+            const freeChatCard = document.getElementById('freeChatCard');
+            if(freeChatCard) {
+                freeChatCard.addEventListener('click', () => {
+                    openChat('Свободное общение', 'Any');
+                });
+            }
+
+            // Старт: загружаем "Мои темы" по умолчанию
+            loadMyTopics();
+        }
+
+        // Вспомогательная функция для вкладки "Все темы" (без персонализации)
+        async function loadAllTopicsPublic() {
+             try {
+                const response = await fetch(`http://${API_HOST}:8002/topics`);
+                const data = await response.json();
+                topicsData = data; // Показываем всё
+                renderTopics();
+                updateUI();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

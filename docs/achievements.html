@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Достижения — AI Chinese</title>
+    <style>
+        /* === ТВОИ СТИЛИ (БЕЗ ИЗМЕНЕНИЙ) === */
+        :root {
+            --bg-app: #FFF9EC; --bg-card: #FFFFFF; --bg-gray-light: #F5E6C8; --bg-gray-dark: #D4A017;
+            --text-main: #2C2C2E; --text-sub: #8B7355; --accent-red: #FF9500;
+            --radius-xl: 20px; --radius-md: 14px; --radius-sm: 10px;
+            --shadow-soft: 0 4px 20px rgba(255, 149, 0, 0.06); --shadow-hover: 0 8px 30px rgba(255, 149, 0, 0.12);
+            --anim-curve: cubic-bezier(0.25, 0.8, 0.25, 1); --nav-bg: rgba(255, 255, 255, 0.85);
+            --nav-border: rgba(0,0,0,0.05); --leader-item-bg: var(--bg-gray-light);
+            --leader-item-current: linear-gradient(135deg, rgba(255,149,0,0.15), rgba(255,149,0,0.05));
+            --stat-icon-bg: rgba(255, 149, 0, 0.1); --achievement-locked-overlay: rgba(255,255,255,0.6);
+            --achievement-icon-locked: var(--bg-gray-light); --section-count-bg: var(--bg-gray-light);
+        }
+        [data-theme="dark"] {
+            --bg-app: #1C1C1E; --bg-card: #2C2C2E; --bg-gray-light: #3A3A3C; --bg-gray-dark: #48484A;
+            --text-main: #F5F5F7; --text-sub: #AEAEB2; --accent-red: #FF9F0A; --leader-item-bg: #563900;
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3); --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --nav-bg: rgba(44, 44, 46, 0.85); --nav-border: rgba(255,255,255,0.1);
+            --leader-item-current: linear-gradient(135deg, rgba(255,159,10,0.2), rgba(255,159,10,0.05));
+            --stat-icon-bg: rgba(255, 159, 10, 0.15); --achievement-locked-overlay: rgba(28,28,30,0.6);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: PTSans-Regular, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-app); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; max-width: 414px; margin: 0 auto; border-left: 1px solid var(--nav-border); border-right: 1px solid var(--nav-border); padding-bottom: 80px; transition: 0.3s; }
+        
+        header { background: var(--bg-app); padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); z-index: 20; display: flex; align-items: center; justify-content: space-between; }
+        .page-title { font-size: 20px; font-weight: 700; }
+
+        .leaderboard-card { background: var(--bg-card); border-radius: var(--radius-xl); padding: 20px 16px; margin: 16px; box-shadow: var(--shadow-soft); animation: slideUp 0.4s var(--anim-curve); }
+        .leaderboard-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .leaderboard-title svg { width: 20px; height: 20px; fill: var(--accent-red); }
+        .leaderboard-list { display: flex; flex-direction: column; gap: 8px; }
+        
+        .leader-item { display: flex; align-items: center; padding: 12px 14px; border-radius: var(--radius-md); background: var(--leader-item-bg); transition: transform 0.2s; }
+        .leader-item:active { transform: scale(0.98); }
+        .leader-item.current-user { background: var(--leader-item-current); border: 2px solid var(--accent-red); }
+        
+        .rank { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-right: 12px; flex-shrink: 0; }
+        .rank.gold { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; animation: pulse 2s infinite; }
+        .rank.silver { background: linear-gradient(135deg, #C0C0C0, #A8A8A8); color: #000; }
+        .rank.bronze { background: linear-gradient(135deg, #CD7F32, #B87333); color: #fff; }
+        .rank.default { background: var(--bg-gray-dark); color: white; }
+
+        .leader-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-red), #FFB74D); display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; }
+        .leader-avatar svg { width: 20px; height: 20px; fill: white; }
+        .leader-avatar.current { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .leader-info { flex: 1; min-width: 0; }
+        .leader-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .leader-meta { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+        .leader-score { font-size: 15px; font-weight: 700; color: var(--accent-red); margin-left: auto; flex-shrink: 0; }
+        .leader-item.current-user .leader-score { color: var(--text-main); }
+
+        .stats-section { margin: 0 16px 20px; animation: slideUp 0.4s var(--anim-curve); }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .stat-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 16px; text-align: center; box-shadow: var(--shadow-soft); }
+        .stat-icon { width: 32px; height: 32px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: var(--stat-icon-bg); border-radius: 10px; }
+        .stat-icon svg { width: 18px; height: 18px; fill: var(--accent-red); }
+        .stat-value { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .stat-label { font-size: 11px; color: var(--text-sub); font-weight: 500; }
+
+        .achievements-section { margin: 0 16px 20px; animation: slideUp 0.4s var(--anim-curve); }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .section-title { font-size: 16px; font-weight: 700; }
+        .section-count { font-size: 12px; color: var(--text-sub); background: var(--section-count-bg); padding: 4px 10px; border-radius: 10px; }
+        .achievements-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        
+        .achievement-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 14px; box-shadow: var(--shadow-soft); display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden; transition: 0.2s; }
+        .achievement-card.unlocked:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+        .achievement-card.locked { opacity: 0.7; filter: grayscale(0.3); }
+        .achievement-card.locked::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--achievement-locked-overlay); z-index: 1; }
+        
+        .achievement-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; position: relative; z-index: 2; }
+        .achievement-card.unlocked .achievement-icon { background: linear-gradient(135deg, var(--accent-red), #FFB74D); }
+        .achievement-card.locked .achievement-icon { background: var(--achievement-icon-locked); }
+        .achievement-icon svg { width: 24px; height: 24px; fill: white; }
+        .achievement-card.locked .achievement-icon svg { fill: var(--text-sub); }
+        
+        .achievement-lock { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; background: var(--bg-gray-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 3; }
+        .achievement-lock svg { width: 12px; height: 12px; fill: white; }
+        
+        .achievement-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; position: relative; z-index: 2; }
+        .achievement-desc { font-size: 10px; color: var(--text-sub); position: relative; z-index: 2; }
+        .achievement-progress { width: 100%; height: 4px; background: var(--bg-gray-light); border-radius: 2px; margin-top: 10px; overflow: hidden; position: relative; z-index: 2; }
+        .achievement-progress-bar { height: 100%; background: var(--accent-red); border-radius: 2px; transition: width 0.5s; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 414px; background: var(--nav-bg); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--nav-border); z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-sub); font-size: 11px; font-weight: 500; gap: 6px; flex: 1; padding: 4px 0; }
+        .nav-item.active { color: var(--text-main); }
+        .nav-icon { width: 24px; height: 24px; fill: currentColor; }
+        .nav-item:active .nav-icon { transform: scale(0.9); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    </style>
+</head>
+<body>
+
+    <header><h1 class="page-title">Достижения</h1></header>
+
+    <main>
+        <!-- Leaderboard -->
+        <section class="leaderboard-card">
+            <div class="leaderboard-title">
+                <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                Топ учеников недели
+            </div>
+            <div class="leaderboard-list" id="leaderboardList"></div>
+        </section>
+
+        <!-- Stats -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                    <div class="stat-value" id="streakCount">0</div>
+                    <div class="stat-label">Дней подряд</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+                    <div class="stat-value" id="wordsCount">0</div>
+                    <div class="stat-label">Слов выучено</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+                    <div class="stat-value" id="xpCount">0</div>
+                    <div class="stat-label">XP очков</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Achievements -->
+        <section class="achievements-section">
+            <div class="section-header">
+                <h2 class="section-title">Ваши достижения</h2>
+                <span class="section-count"><span id="unlockedCount">0</span>/6</span>
+            </div>
+            <div class="achievements-grid" id="achievementsGrid"></div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="achievements.html" class="nav-item active" id='achievementsBtn'>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+            <span>Достижения</span>
+        </a>
+        <a href="index.html" class="nav-item" id='chatsBtn'>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Чаты</span>
+        </a>
+        <a href="profile.html" class="nav-item" id='profileBtn'>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Профиль</span>
+        </a>
+    </nav>
+
+    <script src="./js/client.js"></script>
+
+    <script>
+        // === SETTINGS & THEME ===
+        const HOST = window.API_HOST;
+        const SETTINGS_KEY = 'ai_chinese_settings';
+        const DEFAULT_SETTINGS = { avatar: 'girl', theme: 'light', aiLanguage: 'ru' };
+        const API_URL = `http://${HOST}:8002`;
+
+        function loadSettings() {
+            try {
+                const stored = localStorage.getItem(SETTINGS_KEY);
+                return stored ? { ...DEFAULT_SETTINGS, ...JSON.parse(stored) } : { ...DEFAULT_SETTINGS };
+            } catch (e) { console.error('Failed to load settings:', e); return { ...DEFAULT_SETTINGS }; }
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+            } else {
+                document.body.removeAttribute('data-theme');
+            }
+        }
+
+        // Инициализация темы сразу
+        const settings = loadSettings();
+        applyTheme(settings.theme);
+
+        // === MAIN LOGIC ===
+        async function loadAchievementsData() {
+            const userId = localStorage.getItem('currentUserId');
+            if (!userId) { window.location.href = 'login.html'; return; }
+
+            try {
+                // Загружаем 3 источника данных параллельно
+                const [profRes, achRes, leadRes] = await Promise.all([
+                    fetch(`${API_URL}/profile/${userId}`),
+                    fetch(`${API_URL}/achievements/${userId}`),
+                    fetch(`${API_URL}/leaderboard`)
+                ]);
+
+                if (!profRes.ok || !achRes.ok) throw new Error('Ошибка загрузки основных данных');
+                
+                const profile = await profRes.json();
+                const achievements = await achRes.json();
+                const leaderboard = leadRes.ok ? await leadRes.json() : [];
+
+                renderStats(profile);
+                renderAchievements(achievements);
+                renderLeaderboard(leaderboard, userId);
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                document.getElementById('achievementsGrid').innerHTML = 
+                    '<p style="text-align:center;width:100%;color:var(--text-sub)">Не удалось загрузить данные</p>';
+            }
+        }
+
+        function renderStats(profile) {
+            document.getElementById('streakCount').textContent = profile.streak_days || 0;
+            document.getElementById('wordsCount').textContent = profile.words_learned || 0;
+            document.getElementById('xpCount').textContent = (profile.xp || 0).toLocaleString();
+        }
+
+        function renderAchievements(achievements) {
+            const grid = document.getElementById('achievementsGrid');
+            const unlockedCountEl = document.getElementById('unlockedCount');
+            grid.innerHTML = '';
+            
+            let unlockedTotal = 0;
+            achievements.forEach((ach, index) => {
+                if (ach.unlocked) unlockedTotal++;
+                
+                const card = document.createElement('div');
+                card.className = `achievement-card ${ach.unlocked ? 'unlocked' : 'locked'}`;
+                card.style.animationDelay = `${0.05 + (index % 6) * 0.05}s`;
+                
+                card.innerHTML = `
+                    ${!ach.unlocked ? `<div class="achievement-lock"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div>` : ''}
+                    <div class="achievement-icon">${ach.icon}</div>
+                    <div class="achievement-name">${ach.name}</div>
+                    <div class="achievement-desc">${ach.desc}</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-bar" style="width: ${ach.progress}%"></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            unlockedCountEl.textContent = unlockedTotal;
+        }
+
+        function renderLeaderboard(leaders, currentUserId) {
+            const list = document.getElementById('leaderboardList');
+            list.innerHTML = '';
+            
+            if (!leaders || leaders.length === 0) {
+                list.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-sub)">Пока нет активных игроков</div>';
+                return;
+            }
+
+            // 🔥 Ограничиваем топ-5 (берём первые 5 элементов)
+            const top5 = leaders.slice(0, 5);
+
+            top5.forEach((user, index) => {
+                const isMe = user.id == currentUserId;
+                const item = document.createElement('div');
+                item.className = `leader-item ${isMe ? 'current-user' : ''}`;
+                item.style.animationDelay = `${0.1 + index * 0.05}s`;
+                
+                let rankClass = 'default';
+                if (user.rank === 1) rankClass = 'gold';
+                else if (user.rank === 2) rankClass = 'silver';
+                else if (user.rank === 3) rankClass = 'bronze';
+                
+                // Аватар: если есть ссылка - картинка, если нет - эмодзи
+                const avatarContent = user.avatar_url 
+                    ? `<img src="../backend/${user.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` 
+                    : (isMe ? '⭐' : '👤');
+
+                item.innerHTML = `
+                    <div class="rank ${rankClass}">${user.rank}</div>
+                    <div class="leader-avatar ${isMe ? 'current' : ''}">${avatarContent}</div>
+                    <div class="leader-info">
+                        <div class="leader-name">${user.name}${isMe ? ' (вы)' : ''}</div>
+                        <div class="leader-meta">HSKK ${user.level_hsk} • ${user.streak_days} дн.</div>
+                    </div>
+                    <div class="leader-score">${user.xp.toLocaleString()} XP</div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        // Запуск
+        document.addEventListener('DOMContentLoaded', loadAchievementsData);
+    </script>
+</body>
+</html>

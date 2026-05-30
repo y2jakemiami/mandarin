@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover", shrink-to-fit=no>
+    <title>Профиль — AI Chinese</title>
+    <style>
+        /* === VARIABLES & RESET === */
+        :root {
+            --bg-app: #FFF9EC; --bg-card: #FFFFFF; --bg-gray-light: #F5E6C8; --bg-gray-dark: #D4A017;
+            --text-main: #2C2C2E; --text-sub: #8B7355; --accent-red: #FF9500; --accent-green: #34C759;
+            --radius-xl: 20px; --radius-md: 14px; --nav-bg: rgba(255, 255, 255, 0.85);
+            --modal-overlay: rgba(0,0,0,0.4); --menu-item-active: var(--bg-gray-light);
+        }
+        [data-theme="dark"] {
+            --bg-app: #1C1C1E; --bg-card: #2C2C2E; --bg-gray-light: #3A3A3C; --bg-gray-dark: #48484A;
+            --text-main: #F5F5F7; --text-sub: #AEAEB2; --nav-bg: rgba(44, 44, 46, 0.85);
+            --modal-overlay: rgba(0,0,0,0.7);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: PTSans-Regular, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-app); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; max-width: 414px; margin: 0 auto; padding-bottom: 80px; transition: 0.3s; }
+        
+        /* HEADER & MAIN */
+        header { padding: 16px; font-size: 20px; font-weight: 700; z-index: 10; background: var(--bg-app); position: sticky; top: 0; }
+        main { flex: 1; padding: 0 16px; }
+
+        /* PROFILE CARD */
+        .profile-card { background: var(--bg-card); border-radius: var(--radius-xl); padding: 24px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); animation: slideUp 0.4s; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .avatar-wrapper { position: relative; width: 96px; height: 96px; margin: 0 auto 16px; }
+        .avatar { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #FF9500, #FFB74D); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 16px rgba(255,149,0,0.2); }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar svg { width: 48px; height: 48px; fill: white; }
+        .avatar-edit { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; background: #FF9500; border-radius: 50%; border: 3px solid var(--bg-card); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .avatar-edit svg { width: 14px; height: 14px; fill: white; }
+        .profile-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .profile-email { font-size: 14px; color: var(--text-sub); margin-bottom: 12px; }
+        .profile-level { display: inline-block; background: rgba(255,149,0,0.15); color: #FF9500; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+
+        /* STATS */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .stat-value { font-size: 18px; font-weight: 700; color: #FF9500; margin-bottom: 4px; }
+        .stat-label { font-size: 11px; color: var(--text-sub); }
+
+        /* PREMIUM BANNER */
+        .premium-banner { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: var(--radius-xl); padding: 20px; margin: 16px 0; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3); transition: transform 0.2s; }
+        .premium-banner:active { transform: scale(0.98); }
+        .premium-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .premium-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+        .premium-content p { font-size: 13px; opacity: 0.9; }
+
+        /* MENU */
+        .menu-section { margin-bottom: 20px; }
+        .menu-title { font-size: 13px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; margin-bottom: 10px; padding-left: 4px; }
+        .menu-list { background: var(--bg-card); border-radius: var(--radius-xl); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .menu-item { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--bg-gray-light); cursor: pointer; text-decoration: none; color: var(--text-main); transition: 0.2s; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:active { background: var(--menu-item-active); }
+        .menu-icon { width: 24px; margin-right: 12px; fill: currentColor; }
+        .menu-text { flex: 1; font-size: 15px; }
+        .logout-btn { width: 100%; padding: 16px; background: transparent; border: 2px solid #FF453A; color: #FF453A; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .logout-btn:active { background: #FF453A; color: white; }
+
+        /* --- BOTTOM NAVIGATION --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            border-top: 1px solid var(--nav-border);
+            z-index: 100;
+            transition: background-color 0.3s var(--anim-curve), border-color 0.3s var(--anim-curve);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-sub);
+            font-size: 11px;
+            font-weight: 500;
+            gap: 6px;
+            flex: 1;
+            padding: 4px 0;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: var(--text-main);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            transition: transform 0.2s;
+        }
+        
+        .nav-item:active .nav-icon {
+            transform: scale(0.9);
+        }
+
+        /* MODALS */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-sheet { background: var(--bg-card); width: 100%; border-radius: 20px 20px 0 0; padding: 24px; animation: slideUp 0.3s; max-height: 85vh; overflow-y: auto; }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+        
+        /* FORM ELEMENTS IN MODAL */
+        .form-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--bg-gray-light); border-radius: 10px; background: var(--bg-app); color: var(--text-main); outline: none; }
+        .btn-primary { width: 100%; padding: 14px; background: #FF9500; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .modal-close { width: 100%; padding: 14px; background: transparent; border: none; color: var(--text-sub); margin-top: 10px; cursor: pointer; font-weight: 600; }
+        
+        /* TOGGLES & AVATAR SELECTOR */
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--bg-gray-light); }
+        .toggle-label { font-size: 15px; font-weight: 500; }
+        .toggle-sublabel { font-size: 12px; color: var(--text-sub); }
+        .toggle-switch { width: 50px; height: 28px; background: var(--bg-gray-light); border-radius: 14px; position: relative; cursor: pointer; transition: 0.3s; }
+        .toggle-switch.active { background: #FF9500; }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .toggle-switch.active::after { transform: translateX(22px); }
+        
+        .avatar-selector { display: flex; gap: 12px; margin-top: 8px; }
+        .avatar-option { flex: 1; padding: 12px; border-radius: 12px; background: var(--bg-gray-light); text-align: center; cursor: pointer; border: 1px solid transparent; transition: 0.2s; }
+        .avatar-option.active { border-color: #FF9500; background: rgba(255,149,0,0.1); }
+        .avatar-option img { width: 24px; height: 24px; margin-bottom: 4px; }
+        .avatar-option span { font-size: 13px; font-weight: 500; display: block; }
+    </style>
+</head>
+<body>
+
+    <header>Профиль</header>
+
+    <main>
+        <!-- Profile Card -->
+        <section class="profile-card">
+            <div class="avatar-wrapper">
+                <div class="avatar" id="avatarDisplay">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <div class="avatar-edit" onclick="openAvatarModal()">
+                    <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                </div>
+            </div>
+            <h2 class="profile-name" id="userName">Загрузка...</h2>
+            <p class="profile-email" id="userEmail">...</p>
+            <div class="profile-level" id="userLevel">HSKK 1</div>
+        </section>
+
+        <!-- Stats -->
+        <section class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="subType">Start</div>
+                <div class="stat-label">Подписка</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="wordsCount">0</div>
+                <div class="stat-label">Слов выучено</div>
+            </div>
+        </section>
+
+        <!-- Premium Banner -->
+        <div class="premium-banner" onclick="openPremiumModal()">
+            <div class="premium-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </div>
+            <div class="premium-content">
+                <h3>Mandarin.AI Pro</h3>
+                <p>Безлимитные диалоги и персональный план</p>
+            </div>
+        </div>
+
+        <!-- Menu -->
+        <section class="menu-section">
+            <div class="menu-title">Аккаунт</div>
+            <div class="menu-list">
+                <div class="menu-item" onclick="openEditProfileModal()">
+                    <svg class="menu-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                    <span class="menu-text">Редактировать профиль</span>
+                </div>
+                <div class="menu-item" onclick="openSettingsModal()">
+                    <svg class="menu-icon" viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84 c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.66,6.32L5.27,5.35c-0.22-0.08-0.47,0-0.59,0.22L2.76,8.89 C2.64,9.1,2.7,9.36,2.88,9.5l2.03,1.58C4.89,11.36,4.87,11.69,4.86,12c0,0.31,0.02,0.62,0.07,0.92l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                    <span class="menu-text">Настройки</span>
+                </div>
+                <div class="menu-item" onclick="window.location.href='mailto:support@aichinese.app'">
+                    <svg class="menu-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12H6v-2h7v2zm3-4H6V8h10v2z"/></svg>
+                    <span class="menu-text">Поддержка</span>
+                </div>
+            </div>
+        </section>
+
+        <button class="logout-btn" onclick="logout()">Выйти из аккаунта</button>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="achievements.html" class="nav-item" id='achievementsBtn'>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+            <span>Достижения</span>
+        </a>
+        <a href="index.html" class="nav-item" id='chatsBtn'>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Чаты</span>
+        </a>
+        <a href="profile.html" class="nav-item active" id='profileBtn'>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Профиль</span>
+        </a>
+    </nav>
+
+    <!-- === MODALS === -->
+
+    <!-- 1. Settings Modal (Theme, Lang, Avatar Type) -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-sheet">
+            <h3 class="modal-title">Настройки</h3>
+            
+            <div class="toggle-row">
+                <div><div class="toggle-label">Аватар</div><div class="toggle-sublabel">Персонаж диалога</div></div>
+            </div>
+            <div class="avatar-selector">
+                <div class="avatar-option" data-avatar="girl" onclick="selectAvatar('girl')">
+                    <img src="assets/icons/female-gender-ico.png" alt="Girl">
+                    <span>Девушка</span>
+                </div>
+                <div class="avatar-option" data-avatar="boy" onclick="selectAvatar('boy')">
+                    <img src="assets/icons/male-gender-ico.png" alt="Boy">
+                    <span>Парень</span>
+                </div>
+            </div>
+
+            <div class="toggle-row" style="margin-top:15px">
+                <div><div class="toggle-label">Тёмная тема</div></div>
+                <div class="toggle-switch" id="themeToggle" onclick="toggleTheme()"></div>
+            </div>
+            
+            <button class="modal-close" onclick="closeModals()">Готово</button>
+        </div>
+    </div>
+
+    <!-- 2. Edit Profile Modal (Name, Password) -->
+    <div class="modal" id="editModal">
+        <div class="modal-sheet">
+            <h3 class="modal-title">Редактирование</h3>
+            <input type="text" id="editName" class="form-input" placeholder="Имя">
+            <input type="text" id="editSurname" class="form-input" placeholder="Фамилия">
+            <input type="password" id="editPass" class="form-input" placeholder="Новый пароль (необязательно)">
+            <button class="btn-primary" onclick="saveProfile()">Сохранить изменения</button>
+            <button class="modal-close" onclick="closeModals()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- 3. Avatar Upload Modal -->
+    <div class="modal" id="avatarModal">
+        <div class="modal-sheet">
+            <h3 class="modal-title">Фото профиля</h3>
+            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+            <button class="btn-primary" onclick="document.getElementById('fileInput').click()">Загрузить из галереи</button>
+            <button class="modal-close" onclick="closeModals()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- 4. Premium Modal -->
+    <div class="modal" id="premiumModal">
+        <div class="modal-sheet" style="text-align:center">
+            <h3 class="modal-title">Mandarin.AI Pro</h3>
+            <p style="color:var(--text-sub); margin-bottom:20px">Получите неограниченный доступ ко всем функциям.</p>
+            <button class="btn-primary" onclick="alert('Переход к оплате...'); closeModals()">Оформить за 799₽</button>
+            <button class="modal-close" onclick="closeModals()">Позже</button>
+        </div>
+    </div>
+
+    <script src="./js/client.js"></script>
+
+    <script>
+        const HOST = window.API_HOST;
+        const API_URL = `http://${HOST}:8002`;
+        let userId = localStorage.getItem('currentUserId');
+        let settings = JSON.parse(localStorage.getItem('ai_chinese_settings') || '{"theme":"light","aiLanguage":"ru","avatar":"girl"}');
+
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', () => { 
+            loadProfile(); 
+            applySettings(); 
+        });
+
+        // === DATA LOADING ===
+        async function loadProfile() {
+            if (!userId) { window.location.href = 'login.html'; return; }
+            try {
+                const res = await fetch(`${API_URL}/profile/${userId}`);
+                const data = await res.json();
+
+                console.log(res);
+                
+                document.getElementById('userName').textContent = `${data.first_name} ${data.last_name}`;
+                document.getElementById('userEmail').textContent = data.email;
+                document.getElementById('userLevel').textContent = `HSKK ${data.level_hsk}`;
+                document.getElementById('wordsCount').textContent = data.words_learned;
+                document.getElementById('subType').textContent = data.subscription_type.toUpperCase();
+
+                if (data.avatar_url) {
+                    // предполагаем, что сервер отдает файл по пути /uploads/...
+                    document.getElementById('avatarDisplay').innerHTML = `<img src="../backend/${data.avatar_url}">`;
+                }
+            } catch (e) { console.error("Ошибка загрузки профиля", e); }
+        }
+
+        // === SETTINGS LOGIC ===
+        function applySettings() {
+            // Theme
+            document.body.setAttribute('data-theme', settings.theme);
+            document.getElementById('themeToggle').classList.toggle('active', settings.theme === 'dark');
+                        
+            // Avatar Type (Girl/Boy)
+            document.querySelectorAll('.avatar-option').forEach(el => {
+                el.classList.toggle('active', el.dataset.avatar === settings.avatar);
+            });
+
+            // Save to LocalStorage
+            localStorage.setItem('ai_chinese_settings', JSON.stringify(settings));
+            
+            // Dispatch event for other tabs (if needed)
+            window.dispatchEvent(new CustomEvent('settingsChanged', { detail: settings }));
+        }
+
+        async function selectAvatar(type) {
+            settings.avatar = type;
+            applySettings();
+            // Отправляем на сервер, чтобы синхронизировать с бд
+            await fetch(`${API_URL}/settings/${userId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ avatar_type: type })
+            });
+        }
+
+        function toggleTheme() {
+            settings.theme = settings.theme === 'light' ? 'dark' : 'light';
+            applySettings();
+        }
+
+        function toggleLang() {
+            settings.aiLanguage = settings.aiLanguage === 'ru' ? 'zh' : 'ru';
+            applySettings();
+        }
+
+        // === MODAL HANDLING ===
+        function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
+        function openEditProfileModal() { 
+            const nameParts = document.getElementById('userName').textContent.split(' ');
+            document.getElementById('editName').value = nameParts[0] || '';
+            document.getElementById('editSurname').value = nameParts[1] || '';
+            document.getElementById('editModal').classList.add('active'); 
+        }
+        function openAvatarModal() { document.getElementById('avatarModal').classList.add('active'); }
+        function openPremiumModal() { document.getElementById('premiumModal').classList.add('active'); }
+        
+        function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
+
+        // === ACTIONS ===
+        async function saveProfile() {
+            const fn = document.getElementById('editName').value;
+            const ln = document.getElementById('editSurname').value;
+            const pass = document.getElementById('editPass').value;
+            
+            await fetch(`${API_URL}/profile/${userId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ first_name: fn, last_name: ln, new_password: pass || undefined })
+            });
+            closeModals();
+            loadProfile();
+        }
+
+        async function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const formData = new FormData();
+                formData.append('file', input.files[0]);
+                await fetch(`${API_URL}/upload-avatar/${userId}`, { method: 'POST', body: formData });
+                closeModals();
+                loadProfile();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUserId');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

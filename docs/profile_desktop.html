@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Профиль — Mandarin.AI</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa',
+                            300: '#fdba74', 400: '#fb923c', 500: '#f97316',
+                            600: '#ea580c', 700: '#c2410c',
+                        },
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- ТВОИ СТИЛИ (1:1 с главной) -->
+    <style>
+        :root {
+            --loading-gradient: linear-gradient(135deg, #FFB74D 0%, #FF9800 30%, #FFB74D 60%, #FF9800 100%);
+            --bg-primary: linear-gradient(135deg, #fafafa 0%, #f1f5f9 100%);
+            --bg-surface: rgba(255, 255, 255, 0.85);
+            --bg-surface-hover: rgba(255, 255, 255, 0.95);
+            --text-primary: #191919;
+            --text-secondary: #676767;
+            --text-muted: #787878;
+            --border-color: rgba(255, 255, 255, 0.3);
+            --border-subtle: rgba(226, 232, 240, 0.6);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(248, 250, 252, 0.5);
+            --skeleton-base: #f1f5f9;
+            --skeleton-highlight: #e2e8f0;
+            --sidebar-bg: rgba(255, 255, 255, 0.9);
+            --overlay-bg: rgba(0, 0, 0, 0.4);
+            --glass-blur: blur(12px);
+        }
+
+        .dark {
+            --loading-gradient: linear-gradient(135deg, #1C1C1E 0%, #303030 30%, #1C1C1E 60%, #2C2C2E 100%);
+            --bg-primary: linear-gradient(135deg, #151515 0%, #353535 100%);
+            --bg-surface: rgb(51 51 51 / 85%);
+            --bg-surface-hover: rgb(29 29 29 / 95%);
+            --text-primary: #f1f5f9;
+            --text-secondary: #bfbfbf;
+            --text-muted: #818181;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-subtle: rgb(88 88 88 / 60%);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --input-bg: rgb(80 80 80 / 50%);
+            --skeleton-base: #3a3a3a;
+            --skeleton-highlight: #4d4d4d;
+            --sidebar-bg: rgb(31 31 31 / 90%);
+            --overlay-bg: rgba(0, 0, 0, 0.6);
+            --glass-blur: blur(12px);
+        }
+
+        html { font-size: 16px; scroll-behavior: smooth; }
+        @media (max-width: 1023px) { html { font-size: 15px; } }
+        @media (max-width: 767px) { html { font-size: 14px; } }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        *, *::before, *::after {
+            transition: background-color 0s ease, border-color 0s ease, 
+                       color 0s ease, box-shadow 0s ease, transform 0s ease;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--text-muted); 
+            border-radius: 3px;
+            opacity: 0.5;
+        }
+        ::-webkit-scrollbar-thumb:hover { opacity: 1; }
+
+        #logo_main {
+            background-image: url(../addons/logo_%231.png);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .glass-card {
+            background: var(--bg-surface);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: rgba(249, 115, 22, 0.4);
+            background: var(--bg-surface-hover);
+        }
+        @media (hover: none) { .glass-card:hover { transform: none; } }
+
+        .tab-indicator {
+            position: absolute; bottom: 0; height: 3px;
+            background: linear-gradient(90deg, #f97316, #ea580c);
+            border-radius: 3px 3px 0 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: width, left;
+        }
+
+        .topic-card { position: relative; overflow: hidden; will-change: transform; }
+        .topic-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #f97316, #fb923c, #fdba74);
+            transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease;
+        }
+        .topic-card:hover::before { transform: scaleX(1); }
+        .topic-card .icon-wrapper { transition: all 0.3s ease; background: var(--input-bg); }
+        .topic-card:hover .icon-wrapper {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white; transform: scale(1.05);
+        }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        .floating { animation: float 3s ease-in-out infinite; }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-highlight) 50%, var(--skeleton-base) 75%);
+            background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 0.75rem;
+        }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+        .btn-ripple { position: relative; overflow: hidden; }
+        .btn-ripple::after {
+            content: ''; position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            border-radius: inherit; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            transform: scale(0); transition: transform 0.5s ease; pointer-events: none;
+        }
+        .btn-ripple:active::after { transform: scale(3); transition: transform 0s; }
+
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 2px solid #f97316; outline-offset: 2px;
+        }
+
+        @supports (padding: max(0px)) {
+            .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+            .pt-safe { padding-top: max(0px, env(safe-area-inset-top)); }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+            aside { width: 288px; }
+            header { padding-left: calc(288px + 1rem); }
+        }
+
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: var(--overlay-bg);
+            backdrop-filter: blur(4px); z-index: 25;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+        @media (max-width: 1023px) {
+            aside {
+                position: fixed; left: 0; top: 0; height: 100vh; z-index: 40;
+                transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background: var(--sidebar-bg);
+            }
+            aside.active { transform: translateX(0); }
+            header { padding-left: 1rem !important; }
+            main { margin-left: 0 !important; }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .topic-card, .nav-item, button { -webkit-tap-highlight-color: transparent; }
+            input, select { font-size: 16px !important; }
+        }
+
+        #hskkSelect { width: 10rem; padding-top: 0.75rem; padding-bottom: 0.75rem; padding-left: 0.75rem; }
+
+        .theme-toggle {
+            position: relative; width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--input-bg); border: 1px solid var(--border-subtle);
+            cursor: pointer; color: var(--text-secondary);
+        }
+        .theme-toggle:hover { background: var(--bg-surface-hover); color: var(--text-primary); border-color: var(--border-color); }
+        .theme-toggle svg { width: 20px; height: 20px; transition: all 0.3s ease; }
+        .theme-toggle .sun-icon { opacity: 1; transform: rotate(0) scale(1); }
+        .theme-toggle .moon-icon { opacity: 0; transform: rotate(-90deg) scale(0.8); position: absolute; }
+        .dark .theme-toggle .sun-icon { opacity: 0; transform: rotate(90deg) scale(0.8); }
+        .dark .theme-toggle .moon-icon { opacity: 1; transform: rotate(0) scale(1); }
+
+        @media print {
+            aside, header, nav, .floating, .theme-toggle { display: none !important; }
+            main { overflow: visible !important; }
+            .glass-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+        }
+
+        /* === PROFILE SPECIFIC === */
+        .profile-header {
+            display: grid; grid-template-columns: auto 1fr auto; gap: 24px;
+            align-items: center; padding: 24px;
+        }
+        .profile-avatar-large {
+            position: relative; width: 120px; height: 120px; flex-shrink: 0;
+        }
+        .profile-avatar-large img, .profile-avatar-large .avatar-placeholder {
+            width: 100%; height: 100%; border-radius: 50%;
+            object-fit: cover; background: linear-gradient(135deg, #f97316, #fb923c);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .profile-avatar-large .avatar-placeholder { color: white; font-size: 48px; font-weight: 600; }
+        .avatar-edit-btn {
+            position: absolute; bottom: 4px; right: 4px;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #f97316; border: 3px solid var(--bg-surface);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: white; transition: transform 0.2s;
+        }
+        .avatar-edit-btn:hover { transform: scale(1.1); }
+        .avatar-edit-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        
+        .profile-info h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        .profile-info .email { color: var(--text-secondary); margin-bottom: 12px; }
+        .profile-badges { display: flex; gap: 12px; flex-wrap: wrap; }
+        .badge {
+            padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .badge-hsk { background: rgba(99, 102, 241, 0.1); color: #818cf8; }
+        .badge-sub { background: rgba(249, 115, 22, 0.1); color: #fb923c; }
+        .badge svg { width: 14px; height: 14px; }
+        
+        .profile-stats {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+            padding: 20px 24px; border-top: 1px solid var(--border-subtle);
+        }
+        .profile-stat { text-align: center; }
+        .profile-stat-value { font-size: 24px; font-weight: 700; color: #f97316; }
+        .profile-stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        
+        .profile-grid {
+            display: grid; grid-template-columns: 320px 1fr; gap: 24px;
+        }
+        
+        .settings-section { padding: 20px 24px; }
+        .settings-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .settings-title svg { width: 20px; height: 20px; fill: #f97316; }
+        
+        .setting-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 0; border-bottom: 1px solid var(--border-subtle);
+        }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-info h4 { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+        .setting-info p { font-size: 12px; color: var(--text-secondary); }
+        
+        .toggle-switch {
+            width: 48px; height: 26px; background: var(--input-bg);
+            border-radius: 13px; position: relative; cursor: pointer;
+            border: 1px solid var(--border-subtle); transition: background 0s;
+        }
+        .toggle-switch.active { background: #f97316; border-color: #f97316; }
+        .toggle-switch::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 20px; height: 20px; background: white; border-radius: 50%;
+            transition: transform 0s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toggle-switch.active::after { transform: translateX(22px); }
+        
+        .avatar-selector { display: flex; gap: 12px; margin-top: 8px; }
+        .avatar-option {
+            flex: 1; padding: 12px; border-radius: 12px;
+            background: var(--input-bg); text-align: center;
+            cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
+            width: 20%;
+        }
+        .avatar-option:hover { border-color: #f97316; }
+        .avatar-option.active { border-color: #f97316; background: rgba(249, 115, 22, 0.1); }
+        .avatar-option .preview {
+            width: 48px; height: 48px; margin: 0 auto 8px; border-radius: 50%;
+            background: linear-gradient(135deg, #3b3b3b, #444444, 0);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600;
+        }
+        .avatar-option span { font-size: 13px; font-weight: 500; }
+        
+        .menu-list { display: flex; flex-direction: column; gap: 4px; }
+        .menu-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 10px; cursor: pointer; transition: background 0.2s;
+            color: var(--text-primary); text-decoration: none;
+        }
+        .menu-link:hover { background: var(--input-bg); }
+        .menu-link svg { width: 20px; height: 20px; fill: var(--text-secondary); }
+        .menu-link.danger { color: #ef4444; }
+        .menu-link.danger svg { fill: #ef4444; }
+        
+        .premium-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border-radius: 20px; padding: 24px;
+            display: flex; align-items: center; gap: 20px; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .premium-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4); }
+        .premium-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: rgba(255,255,255,0.2); display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .premium-icon svg { width: 28px; height: 28px; fill: white; }
+        .premium-content h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .premium-content p { font-size: 14px; opacity: 0.9; }
+        .premium-cta {
+            margin-left: auto; padding: 10px 20px; background: white;
+            color: #764ba2; border-radius: 10px; font-weight: 600;
+            font-size: 14px; white-space: nowrap;
+        }
+        
+        .activity-list { display: flex; flex-direction: column; gap: 12px; }
+        .activity-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px;
+            border-radius: 12px; background: var(--input-bg);
+        }
+        .activity-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: rgba(249, 115, 22, 0.1); display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .activity-icon svg { width: 20px; height: 20px; fill: #f97316; }
+        .activity-details { flex: 1; min-width: 0; }
+        .activity-title { font-weight: 600; font-size: 14px; }
+        .activity-time { font-size: 12px; color: var(--text-secondary); }
+        .activity-xp { font-weight: 700; color: #f97316; font-size: 14px; }
+        
+        /* === MODALS (Desktop: centered) === */
+        .modal {
+            position: fixed; inset: 0; background: var(--overlay-bg);
+            backdrop-filter: blur(4px); z-index: 200;
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-sheet {
+            background: var(--bg-surface); border-radius: 20px;
+            padding: 24px; width: 100%; max-width: 480px;
+            box-shadow: var(--shadow-glass); border: 1px solid var(--border-color);
+            animation: fadeInUp 0.3s ease-out;
+        }
+        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+        
+        .form-input {
+            width: 100%; padding: 12px 16px; margin-bottom: 16px;
+            border: 1px solid var(--border-subtle); border-radius: 12px;
+            background: var(--input-bg); color: var(--text-primary);
+            font-size: 14px; outline: none; transition: border-color 0.2s;
+        }
+        .form-input:focus { border-color: #f97316; }
+        
+        .btn-primary {
+            width: 100%; padding: 14px; background: #f97316; color: white;
+            border: none; border-radius: 12px; font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3); }
+        .btn-primary:active { transform: translateY(0); }
+        
+        .btn-secondary {
+            width: 100%; padding: 14px; background: transparent;
+            color: var(--text-secondary); border: 1px solid var(--border-subtle);
+            border-radius: 12px; font-weight: 600; font-size: 14px;
+            cursor: pointer; margin-top: 12px; transition: background 0.2s;
+        }
+        .btn-secondary:hover { background: var(--input-bg); }
+        
+        .modal-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 32px; height: 32px; border-radius: 8px;
+            background: var(--input-bg); border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-secondary);
+        }
+        .modal-close:hover { background: var(--bg-surface-hover); color: var(--text-primary); }
+        .modal-close svg { width: 18px; height: 18px; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+<body class="h-screen w-full overflow-hidden flex flex-col md:flex-row">
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay md:hidden" aria-hidden="true"></div>
+
+    <!-- SIDEBAR (как на главной) -->
+    <aside id="sidebar" class="hidden md:flex flex-col w-72 h-full border-r z-30" style="background: var(--sidebar-bg); border-color: var(--border-subtle);">
+        <!-- Logo + Theme Toggle -->
+        <div class="p-5 md:p-6 flex items-center justify-between border-b" style="border-color: var(--border-subtle);">
+            <div class="flex items-center gap-3">
+                <div class="relative flex-shrink-0">
+                    <div id='logo_main' class="w-10 h-10 md:w-11 md:h-11 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center text-white shadow-[0_0_20px_0_rgba(249,115,22,0.6)] shadow-primary-500/100"></div>
+                </div>
+                <div class="min-w-0">
+                    <span class="text-lg md:text-xl font-bold tracking-tight">Mandarin.<span class="text-primary-500">AI</span></span>
+                    <p class="text-xs opacity-60 -mt-0.5 hidden sm:block">Real-Qwest-Talk</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 px-2 md:px-3 py-3 md:py-4 space-y-1 md:space-y-1.5 overflow-y-auto">
+            <a href="index_desktop.html" class="nav-item flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl font-medium transition-all opacity-70 hover:opacity-100" style="color: var(--text-secondary);">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span class="truncate">Чаты</span>
+            </a>
+            <a href="achievements_desktop.html" class="nav-item flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl font-medium transition-all opacity-70 hover:opacity-100" style="color: var(--text-secondary);">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                <span class="truncate">Достижения</span>
+            </a>
+            <a href="#" class="nav-item active flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl font-medium transition-all group" style="color: var(--text-primary); background: rgba(249, 115, 22, 0.1);">
+                <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="truncate">Профиль</span>
+            </a>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="p-3 md:p-4 border-t" style="border-color: var(--border-subtle);">
+            <div class="glass-card rounded-xl md:rounded-2xl p-2.5 md:p-3 flex items-center gap-3 cursor-pointer" style="background: var(--input-bg);">
+                <div class="relative flex-shrink-0" id="avatarDisplay">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md">U</div>
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 md:w-3 md:h-3 bg-green-400 rounded-full border-2 border-white"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p id='userId' class="text-sm font-semibold truncate" style="color: var(--text-primary);">Пользователь</p>
+                    <span id='userXp' class="text-xs opacity-60">1,250 XP</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        
+        <!-- HEADER (как на главной) -->
+        <header class="border-b px-3 md:px-6 lg:px-8 py-3 md:py-4 flex items-center justify-between sticky top-0 z-20" style="background: var(--bg-surface); border-color: var(--border-subtle); backdrop-filter: var(--glass-blur);">
+            <button id="menuToggle" class="md:hidden p-2.5 rounded-xl transition-colors" style="color: var(--text-secondary);" aria-label="Меню">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div class="flex-1 max-w-5xl mx-auto flex flex-col xs:flex-row gap-2.5 md:gap-3 items-stretch xs:items-center">
+                <div class="relative w-full xs:w-auto xs:flex-1 group"></div>
+            </div>
+            <div class="hidden md:flex items-center gap-2 lg:gap-3 ml-2 lg:ml-4">
+                <div class="flex items-center gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-lg lg:rounded-xl text-xs font-semibold backdrop-blur-sm" style="background: rgba(99, 102, 241, 0.1); border: 1px solid var(--border-subtle); color: #818cf8;">
+                    <img width="14" height="14" src="assets/icons/icons8-флаг-2-32(1).png" alt="" onerror="this.style.display='none'" class="hidden sm:block"/>
+                    <span id="hsk_level_item">HSKK</span>
+                </div>
+                <div class="flex items-center gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-lg lg:rounded-xl text-xs font-semibold backdrop-blur-sm" style="background: rgba(249, 115, 22, 0.1); border: 1px solid var(--border-subtle); color: #fb923c;">
+                    <svg class="w-3.5 h-3.5 lg:w-4 lg:h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    <span id="xp_level_item">XP</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 scroll-smooth">
+            <div class="max-w-6xl mx-auto">
+
+                <!-- Profile Header Card -->
+                <section class="glass-card rounded-2xl mb-6 animate-fade-in-up">
+                    <div class="profile-header">
+                        <div class="profile-avatar-large">
+                            <div class="avatar-placeholder" id="mainAvatarDisplay">U</div>
+                            <label class="avatar-edit-btn" for="avatarUpload" title="Изменить фото">
+                                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                            </label>
+                            <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+                        </div>
+                        <div class="profile-info">
+                            <h1 id="userName">Загрузка...</h1>
+                            <p class="email" id="userEmail">...</p>
+                            <div class="profile-badges">
+                                <span class="badge badge-hsk">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                                    <span id="userLevel">HSK</span>
+                                </span>
+                                <span class="badge badge-sub">
+                                    <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+                                    <span id="subType">START</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button class="glass-card px-4 py-2 rounded-xl font-medium hover:bg-surface-hover transition" onclick="openEditModal()" style="color: var(--text-primary);">
+                                Редактировать
+                            </button>
+                            <button class="btn-ripple px-4 py-2 rounded-xl font-medium bg-primary-500 hover:bg-primary-600 text-white transition" onclick="openPremiumModal()">
+                                Pro: 299₽
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="wordsCount">0</div>
+                            <div class="profile-stat-label">Слов выучено</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="streakCount">0</div>
+                            <div class="profile-stat-label">Дней подряд</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="chatsCount">0</div>
+                            <div class="profile-stat-label">Диалогов</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value" id="achievementsCount">0</div>
+                            <div class="profile-stat-label">Достижений</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Two Column Layout -->
+                <div class="profile-grid">
+                    
+                    <!-- Left Column: Settings -->
+                    <div class="space-y-6">
+                        
+                        <!-- Settings Card -->
+                        <section class="glass-card rounded-2xl animate-fade-in-up" style="animation-delay: 100ms;">
+                            <div class="settings-section">
+                                <h3 class="settings-title">
+                                    <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84 c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.66,6.32L5.27,5.35c-0.22-0.08-0.47,0-0.59,0.22L2.76,8.89 C2.64,9.1,2.7,9.36,2.88,9.5l2.03,1.58C4.89,11.36,4.87,11.69,4.86,12c0,0.31,0.02,0.62,0.07,0.92l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                                    Настройки
+                                </h3>
+                                
+                                <div class="setting-row">
+                                    <div class="setting-info">
+                                        <h4>Аватар диалога</h4>
+                                        <p>Персонаж в чате</p>
+                                    </div>
+                                    <div class="avatar-selector">
+                                        <div class="avatar-option" data-avatar="girl" onclick="selectAvatar('girl')">
+                                            <div class="preview">
+                                                <img src="assets/icons/female-gender-ico.png" width="32px" fill="white" alt="Girl">
+                                            </div>
+                                            <span>Девушка</span>
+                                        </div>
+                                        <div class="avatar-option" data-avatar="boy" onclick="selectAvatar('boy')">
+                                            <div class="preview">
+                                                <img src="assets/icons/male-gender-ico.png" width="32px" fill="white" alt="Girl">
+                                            </div>
+                                            <span>Парень</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-row">
+                                    <div class="setting-info">
+                                        <h4>Тёмная тема</h4>
+                                        <p>Интерфейс</p>
+                                    </div>
+                                    <div class="toggle-switch" id="themeToggleInline" onclick="toggleTheme()"></div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Menu Card -->
+                        <section class="glass-card rounded-2xl animate-fade-in-up" style="animation-delay: 150ms;">
+                            <div class="settings-section">
+                                <h3 class="settings-title">
+                                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                    Аккаунт
+                                </h3>
+                                <div class="menu-list">
+                                    <a class="menu-link" onclick="openEditModal()">
+                                        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                        <span>Редактировать профиль</span>
+                                    </a>
+                                    <a class="menu-link" href="mailto:support@aichinese.app">
+                                        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12H6v-2h7v2zm3-4H6V8h10v2z"/></svg>
+                                        <span>Поддержка</span>
+                                    </a>
+                                    <a class="menu-link danger" onclick="logout()">
+                                        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                                        <span>Выйти из аккаунта</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </section>
+                        
+                    </div>
+                    
+                    <!-- Right Column: Premium + Activity -->
+                    <div class="space-y-6">
+                        
+                        <!-- Premium Banner -->
+                        <div class="premium-card animate-fade-in-up" style="animation-delay: 200ms;" onclick="openPremiumModal()">
+                            <div class="premium-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            </div>
+                            <div class="premium-content">
+                                <h3>Mandarin.AI Pro</h3>
+                                <p>Безлимитные диалоги, персональный план и приоритетная поддержка</p>
+                            </div>
+                            <span class="premium-cta">Попробовать →</span>
+                        </div>
+                        
+                        <!-- Recent Activity -->
+                        <section class="glass-card rounded-2xl animate-fade-in-up" style="animation-delay: 250ms;">
+                            <div class="settings-section">
+                                <h3 class="settings-title">
+                                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                                    Недавняя активность
+                                </h3>
+                                <div class="activity-list" id="activityList">
+                                    <!-- Skeleton -->
+                                    <div class="activity-item"><div class="activity-icon skeleton" style="width:40px;height:40px"></div><div style="flex:1"><div class="skeleton" style="height:14px;width:60%;margin-bottom:6px"></div><div class="skeleton" style="height:10px;width:40%"></div></div><div class="skeleton" style="height:14px;width:40px"></div></div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Bottom Nav (Mobile) -->
+        <nav class="md:hidden fixed bottom-0 w-full border-t flex justify-around py-2 px-2 z-30 pb-safe" style="background: var(--bg-surface); border-color: var(--border-subtle); backdrop-filter: var(--glass-blur);">
+            <a href="achievements.html" class="nav-item flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl transition-colors opacity-70 hover:opacity-100">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                <span class="text-[10px]">Достижения</span>
+            </a>
+            <a href="index.html" class="nav-item flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl transition-colors opacity-70 hover:opacity-100">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span class="text-[10px]">Чаты</span>
+            </a>
+            <a href="profile.html" class="nav-item active flex flex-col items-center gap-1 py-1.5 px-3">
+                <div class="relative">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary-500 rounded-full border-2 border-white"></span>
+                </div>
+                <span class="text-[10px] font-semibold" style="color: var(--text-primary);">Профиль</span>
+            </a>
+        </nav>
+
+    </main>
+
+    <!-- === MODALS (Desktop: centered) === -->
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editModal">
+        <button class="modal-close" onclick="closeModals()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="modal-sheet">
+            <h3 class="modal-title">Редактирование профиля</h3>
+            <input type="text" id="editName" class="form-input" placeholder="Имя">
+            <input type="text" id="editSurname" class="form-input" placeholder="Фамилия">
+            <input type="email" id="editEmail" class="form-input" placeholder="Email">
+            <input type="password" id="editPass" class="form-input" placeholder="Новый пароль (необязательно)">
+            <button class="btn-primary" onclick="saveProfile()">Сохранить изменения</button>
+            <button class="btn-secondary" onclick="closeModals()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal (Avatar type) -->
+    <div class="modal" id="settingsModal">
+        <button class="modal-close" onclick="closeModals()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="modal-sheet">
+            <h3 class="modal-title">Настройки аватара</h3>
+            <p style="text-align:center;color:var(--text-secondary);margin-bottom:20px">Выберите персонажа для диалогов</p>
+            <div class="avatar-selector" style="justify-content:center">
+                <div class="avatar-option" data-avatar="girl" onclick="selectAvatar('girl');closeModals()">
+                    <div class="preview">♀</div>
+                    <span>Девушка</span>
+                </div>
+                <div class="avatar-option" data-avatar="boy" onclick="selectAvatar('boy');closeModals()">
+                    <div class="preview">♂</div>
+                    <span>Парень</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Modal -->
+    <div class="modal" id="premiumModal">
+        <button class="modal-close" onclick="closeModals()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="modal-sheet" style="text-align:center">
+            <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#667eea,#764ba2);margin:0 auto 20px;display:flex;align-items:center;justify-content:center">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </div>
+            <h3 class="modal-title">Mandarin.AI Pro</h3>
+            <p style="color:var(--text-secondary);margin-bottom:24px;line-height:1.5">
+                • Безлимитные диалоги с ИИ<br>
+                • Персональный план обучения<br>
+                • Приоритетная поддержка 24/7<br>
+                • Экспорт прогресса в PDF
+            </p>
+            <button class="btn-primary" onclick="alert('Переход к оплате...'); closeModals()">Оформить за 299₽/мес</button>
+            <button class="btn-secondary" onclick="closeModals()">Позже</button>
+        </div>
+    </div>
+
+    <script src="./js/client.js"></script>
+    <script>
+        // === CONFIG (как на главной) ===
+        const API_HOST = window.API_HOST || 'localhost';
+        const API_URL = `http://${API_HOST}:8002`;
+        const SETTINGS_KEY = 'ai_chinese_settings';
+        const THEME_KEY = 'chinese_ai_theme';
+        const DEFAULT_SETTINGS = { avatar: 'girl', theme: 'light', aiLanguage: 'ru' };
+
+        // === STATE ===
+        let sidebarOpen = false;
+        let settings = { ...DEFAULT_SETTINGS };
+
+        // === DOM ===
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const menuToggle = document.getElementById('menuToggle');
+        const themeToggleInline = document.getElementById('themeToggleInline');
+
+        // === THEME (как на главной) ===
+        function loadSettings() {
+            try {
+                const stored = localStorage.getItem(SETTINGS_KEY);
+                return stored ? { ...DEFAULT_SETTINGS, ...JSON.parse(stored) } : { ...DEFAULT_SETTINGS };
+            } catch (e) { return { ...DEFAULT_SETTINGS }; }
+        }
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem(THEME_KEY, theme);
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const newTheme = isDark ? 'light' : 'dark';
+            settings.theme = newTheme;
+            applyTheme(newTheme);
+            updateThemeToggles();
+            saveSettings();
+        }
+        function updateThemeToggles() {
+            const isDark = settings.theme === 'dark';
+            [themeToggleInline].forEach(t => {
+                if (t) t.classList.toggle('active', isDark);
+            });
+        }
+
+        // === SETTINGS ===
+        function saveSettings() {
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+            window.dispatchEvent(new CustomEvent('settingsChanged', { detail: settings }));
+        }
+        function selectAvatar(type) {
+            settings.avatar = type;
+            document.querySelectorAll('.avatar-option').forEach(el => {
+                el.classList.toggle('active', el.dataset.avatar === type);
+            });
+            saveSettings();
+            // Sync with backend
+            fetch(`${API_URL}/settings/${localStorage.getItem('currentUserId')}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ avatar_type: type })
+            }).catch(console.error);
+        }
+        function toggleLang() {
+            settings.aiLanguage = settings.aiLanguage === 'ru' ? 'zh' : 'ru';
+            document.getElementById('langToggle').classList.toggle('active', settings.aiLanguage === 'zh');
+            saveSettings();
+        }
+
+        // === SIDEBAR ===
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            sidebar.classList.toggle('active', sidebarOpen);
+            sidebarOverlay.classList.toggle('active', sidebarOpen);
+            menuToggle?.setAttribute('aria-expanded', sidebarOpen);
+            document.body.style.overflow = sidebarOpen ? 'hidden' : '';
+        }
+        function closeSidebar() {
+            if (sidebarOpen) {
+                sidebarOpen = false;
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                menuToggle?.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            }
+        }
+        menuToggle?.addEventListener('click', toggleSidebar);
+        sidebarOverlay?.addEventListener('click', closeSidebar);
+
+        // === MODALS ===
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
+        function openEditModal() { 
+            document.getElementById('editName').value = document.getElementById('userName').textContent.split(' ')[0] || '';
+            document.getElementById('editSurname').value = document.getElementById('userName').textContent.split(' ')[1] || '';
+            document.getElementById('editEmail').value = document.getElementById('userEmail').textContent;
+            openModal('editModal');
+        }
+        function openPremiumModal() { openModal('premiumModal'); }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModals();
+            });
+        });
+
+        function updateUserMini(profile) {
+            const name = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Пользователь';
+            document.getElementById('userId').textContent = name;
+            document.getElementById('userXp').textContent = (profile.xp || 0).toLocaleString() + ' XP';
+            if (profile.avatar_url && document.getElementById('avatarDisplay')) {
+                const avatar = document.getElementById('avatarDisplay').querySelector('div');
+                if (avatar) {
+                    avatar.innerHTML = `<img src="${profile.avatar_url.startsWith('http') ? profile.avatar_url : '../backend/' + profile.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+                }
+            }
+        }
+
+        // === DATA LOADING ===
+        async function loadProfile() {
+            const userId = localStorage.getItem('currentUserId');
+            if (!userId) { window.location.href = 'login.html'; return; }
+            
+            try {
+                const res = await fetch(`${API_URL}/profile/${userId}`);
+                const data = await res.json();
+
+                // Profile info
+                const fullName = `${data.first_name || ''} ${data.last_name || ''}`.trim() || 'Пользователь';
+                document.getElementById('userName').textContent = fullName;
+                document.getElementById('userEmail').textContent = data.email || '—';
+                document.getElementById('userLevel').textContent = `HSKK ${data.level_hsk || 1}`;
+                document.getElementById('subType').textContent = (data.subscription_type || 'start').toUpperCase();
+                
+                // Stats
+                document.getElementById('wordsCount').textContent = data.words_learned || 0;
+                document.getElementById('streakCount').textContent = data.streak_days || 0;
+                document.getElementById('chatsCount').textContent = data.chats_count || 0;
+                document.getElementById('achievementsCount').textContent = data.achievements_unlocked || 0;
+                
+                // Header stats
+                if(document.getElementById('hsk_level_item')) 
+                    document.getElementById('hsk_level_item').textContent = `HSKK ${data.level_hsk || 1}`;
+                if(document.getElementById('xp_level_item')) 
+                    document.getElementById('xp_level_item').textContent = (data.xp || 0).toLocaleString() + ' XP';
+                
+                // Sidebar mini profile
+                document.getElementById('userId').textContent = fullName;
+                document.getElementById('userXp').textContent = (data.xp || 0).toLocaleString() + ' XP';
+                
+                // Avatar
+                if (data.avatar_url) {
+                    const url = data.avatar_url.startsWith('http') ? data.avatar_url : `../backend/${data.avatar_url}`;
+                    updateUserMini(data);
+                    document.getElementById('mainAvatarDisplay').innerHTML = `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+                    console.log(`../backend/${data.avatar_url}`);
+                }
+                
+            } catch (e) { console.error("Ошибка загрузки профиля", e); }
+        }
+
+        function renderActivity() {
+            const list = document.getElementById('activityList');
+            const activities = [
+                { icon: '💬', title: 'Диалог: "В ресторане"', time: '2 часа назад', xp: '+15 XP' },
+                { icon: '🎯', title: 'Достижение: "Первые 10 слов"', time: 'Вчера', xp: '+50 XP' },
+                { icon: '📚', title: 'Урок: Приветствия', time: '2 дня назад', xp: '+20 XP' },
+            ];
+            list.innerHTML = activities.map(a => `
+                <div class="activity-item">
+                    <div class="activity-icon">${a.icon}</div>
+                    <div class="activity-details">
+                        <div class="activity-title">${a.title}</div>
+                        <div class="activity-time">${a.time}</div>
+                    </div>
+                    <div class="activity-xp">${a.xp}</div>
+                </div>
+            `).join('');
+        }
+
+        // === ACTIONS ===
+        async function saveProfile() {
+            const userId = localStorage.getItem('currentUserId');
+            const fn = document.getElementById('editName').value;
+            const ln = document.getElementById('editSurname').value;
+            const email = document.getElementById('editEmail').value;
+            const pass = document.getElementById('editPass').value;
+            
+            await fetch(`${API_URL}/profile/${userId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    first_name: fn, 
+                    last_name: ln, 
+                    email: email,
+                    new_password: pass || undefined 
+                })
+            });
+            closeModals();
+            loadProfile();
+        }
+
+        async function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const userId = localStorage.getItem('currentUserId');
+                const formData = new FormData();
+                formData.append('file', input.files[0]);
+                await fetch(`${API_URL}/upload-avatar/${userId}`, { method: 'POST', body: formData });
+                loadProfile();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUserId');
+            window.location.href = 'login.html';
+        }
+
+        // === KEYBOARD SHORTCUTS ===
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { closeModals(); if (sidebarOpen) closeSidebar(); }
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                document.getElementById('searchInput')?.focus();
+            }
+            if (e.key.toLowerCase() === 't' && !e.metaKey && !e.ctrlKey && document.activeElement.tagName !== 'INPUT') {
+                toggleTheme();
+            }
+            if (e.key.toLowerCase() === 'e' && !e.metaKey && !e.ctrlKey) {
+                openEditModal();
+            }
+        });
+
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', () => {
+            settings = loadSettings();
+            applyTheme(settings.theme);
+            updateThemeToggles();
+            
+            // Avatar selector init
+            document.querySelectorAll('.avatar-option').forEach(el => {
+                el.classList.toggle('active', el.dataset.avatar === settings.avatar);
+            });
+            document.getElementById('langToggle')?.classList.toggle('active', settings.aiLanguage === 'zh');
+            
+            loadProfile();
+        });
+
+        // Handle resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (window.innerWidth >= 1024 && sidebarOpen) closeSidebar();
+            }, 150);
+        });
+    </script>
+</body>
+</html>

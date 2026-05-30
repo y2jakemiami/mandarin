@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RU-ZH Переводчик Pro</title>
+    <!-- Подключаем библиотеку для Пиньиня -->
+    <script src="https://unpkg.com"></script>
+    <style>
+        :root { --primary: #007aff; --bg: #f0f2f5; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 500px; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        h2 { margin-top: 0; color: #1d1d1f; text-align: center; }
+        textarea { width: 100%; height: 120px; padding: 12px; border: 1px solid #d2d2d7; border-radius: 10px; font-size: 16px; resize: none; outline: none; box-sizing: border-box; }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,122,255,0.1); }
+        .controls { margin: 15px 0; }
+        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        button:hover { opacity: 0.9; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .result-box { margin-top: 20px; padding: 15px; border-radius: 10px; background: #f9f9fb; border: 1px solid #e5e5ea; position: relative; }
+        .chinese { font-size: 22px; color: #1c1c1e; font-weight: 500; display: block; margin-bottom: 5px; }
+        .pinyin { color: #ff9500; font-size: 15px; font-style: italic; }
+        .error { color: #ff3b30; font-size: 14px; margin-top: 10px; text-align: center; }
+        .speak-btn { background: none; color: var(--primary); font-size: 13px; width: auto; padding: 5px 10px; margin-top: 10px; border: 1px solid var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Переводчик + Pinyin</h2>
+    <textarea id="inputText" placeholder="Введите русский или китайский текст..."></textarea>
+    
+    <div class="controls">
+        <button id="mainBtn" onclick="handleTranslate()">Перевести</button>
+    </div>
+
+    <div id="error" class="error" style="display: none;"></div>
+
+    <div id="resultBox" class="result-box" style="display: none;">
+        <span id="outText" class="chinese"></span>
+        <span id="outPinyin" class="pinyin"></span>
+        <button class="speak-btn" onclick="speakText()">🔊 Прослушать</button>
+    </div>
+</div>
+
+<script>
+    const { pinyin } = pinyinPro;
+
+    async function handleTranslate() {
+        const input = document.getElementById('inputText').value.trim();
+        const mainBtn = document.getElementById('mainBtn');
+        const errDiv = document.getElementById('error');
+        const resBox = document.getElementById('resultBox');
+
+        if (!input) return;
+
+        // Сброс состояния
+        mainBtn.disabled = true;
+        mainBtn.innerText = "Загрузка...";
+        errDiv.style.display = 'none';
+        resBox.style.display = 'none';
+
+        // Определяем язык (наличие иероглифов)
+        const isChineseInput = /[\u4e00-\u9fa5]/.test(input);
+        const pair = isChineseInput ? 'zh-CN|ru' : 'ru|zh-CN';
+
+        try {
+            // Используем Lingva API (более стабильный прокси для Google Translate)
+            const response = await fetch(`https://lingva.ml{pair.replace('|','/')}/${encodeURIComponent(input)}`);
+            
+            if (!response.ok) throw new Error();
+
+            const data = await response.json();
+            const translated = data.translation;
+
+            document.getElementById('outText').innerText = translated;
+
+            // Генерируем пиньинь для китайского (если он в результате или в вводе)
+            if (!isChineseInput) {
+                // Если переводили С русского НА китайский
+                document.getElementById('outPinyin').innerText = pinyin(translated);
+            } else {
+                // Если вводили китайский, показываем пиньинь для него
+                document.getElementById('outPinyin').innerText = pinyin(input);
+            }
+
+            resBox.style.display = 'block';
+        } catch (e) {
+            errDiv.innerText = "Сервер перегружен. Попробуйте нажать кнопку ещё раз через пару секунд.";
+            errDiv.style.display = 'block';
+        } finally {
+            mainBtn.disabled = false;
+            mainBtn.innerText = "Перевести";
+        }
+    }
+
+    function speakText() {
+        const text = document.getElementById('outText').innerText;
+        const utterance = new SpeechSynthesisUtterance(text);
+        // Автоопределение языка для озвучки
+        utterance.lang = /[\u4e00-\u9fa5]/.test(text) ? 'zh-CN' : 'ru-RU';
+        window.speechSynthesis.speak(utterance);
+    }
+</script>
+
+</body>
+</html>
