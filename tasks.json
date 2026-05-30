@@ -1,0 +1,132 @@
+{
+  "testConfig": {
+    "title": "Тест уровня китайского языка",
+    "description": "Проверьте свои знания: лексика, грамматика, аудирование и говорение",
+    "passingScore": 70,
+    "levels": {
+      "HSKK1": "0-39",
+      "HSKK2": "40-59", 
+      "HSKK3": "60-79"
+    }
+  },
+  "tasks": [
+    {
+      "id": 1,
+      "category": "vocabulary",
+      "type": "multiple-choice",
+      "question": "Что означает слово «你好»?",
+      "options": ["Спасибо", "Привет", "До свидания", "Извините"],
+      "correctAnswer": 1,
+      "explanation": "你好 (nǐ hǎo) — самое распространённое приветствие в китайском языке",
+      "points": 10
+    },
+    {
+      "id": 2,
+      "category": "vocabulary",
+      "type": "multiple-choice",
+      "question": "Как переводится «вода» на китайский?",
+      "options": ["火", "水", "木", "金"],
+      "correctAnswer": 1,
+      "explanation": "水 (shuǐ) — вода, один из пяти элементов у-син",
+      "points": 10
+    },
+    {
+      "id": 3,
+      "category": "vocabulary",
+      "type": "match-image",
+      "question": "Выберите иероглиф для «солнце»",
+      "options": ["月", "日", "山", "人"],
+      "correctAnswer": 1,
+      "explanation": "日 (rì) — солнце, день",
+      "points": 10
+    },
+    {
+      "id": 4,
+      "category": "grammar",
+      "type": "multiple-choice",
+      "question": "Выберите правильный порядок слов: «Я люблю Китай»",
+      "options": [
+        "爱中国我",
+        "我爱中国", 
+        "中国爱我",
+        "我爱中国吗"
+      ],
+      "correctAnswer": 1,
+      "explanation": "В китайском языке порядок: Подлежащее + Сказуемое + Дополнение",
+      "points": 15
+    },
+    {
+      "id": 5,
+      "category": "grammar",
+      "type": "fill-blank",
+      "question": "Вставьте частицу: 你是学生___？(Вы студент?)",
+      "options": ["的", "吗", "了", "在"],
+      "correctAnswer": 1,
+      "explanation": "吗 (ma) — вопросительная частица для общих вопросов",
+      "points": 15
+    },
+    {
+      "id": 6,
+      "category": "grammar",
+      "type": "multiple-choice",
+      "question": "Какая мера счета используется для «книга»?",
+      "options": ["个", "本", "只", "条"],
+      "correctAnswer": 1,
+      "explanation": "一本书 (yī běn shū) — «книга» считается мерой 本",
+      "points": 15
+    },
+    {
+      "id": 7,
+      "category": "listening",
+      "type": "audio-choice",
+      "question": "Прослушайте и выберите правильный перевод",
+      "audioUrl": "assets/audio/nihao.mp3",
+      "audioText": "你好，很高兴认识你",
+      "options": [
+        "Привет, рад знакомству",
+        "Спасибо, до свидания",
+        "Извините, я не понимаю",
+        "Как дела, хорошо?"
+      ],
+      "correctAnswer": 0,
+      "explanation": "很高兴认识你 (hěn gāoxìng rènshi nǐ) — рад(а) знакомству",
+      "points": 20
+    },
+    {
+      "id": 8,
+      "category": "listening",
+      "type": "audio-choice",
+      "question": "Что вы услышали?",
+      "audioUrl": "assets/audio/xiexie.mp3",
+      "audioText": "谢谢",
+      "options": ["До свидания", "Спасибо", "Пожалуйста", "Привет"],
+      "correctAnswer": 1,
+      "explanation": "谢谢 (xièxie) — спасибо",
+      "points": 20
+    },
+    {
+      "id": 9,
+      "category": "speaking",
+      "type": "voice-record",
+      "question": "Произнесите вслух: «你好»",
+      "promptText": "Нажмите и удерживайте для записи",
+      "expectedPinyin": "nǐ hǎo",
+      "expectedText": ["你好", "您 好"],
+      "explanation": "Обратите внимание на третий тон в обоих слогах",
+      "points": 25,
+      "selfAssessment": true
+    },
+    {
+      "id": 10,
+      "category": "speaking",
+      "type": "voice-record",
+      "question": "Ответьте на вопрос: 你好吗？(Как дела?)",
+      "promptText": "Запишите ваш ответ (например: 我很好)",
+      "expectedPinyin": "wǒ hěn hǎo",
+      "expectedText": ["我很好", "我 很 好", "我 很好", "我很 好"],
+      "explanation": "Типичный ответ: 我很好 (wǒ hěn hǎo) — у меня всё хорошо",
+      "points": 25,
+      "selfAssessment": true
+    }
+  ]
+}
