@@ -1,0 +1,887 @@
+:root {
+    /* === LIGHT THEME (default) === */
+    --bg-app: #F2F2F7;
+    --bg-card: #FFFFFF;
+    --bg-gray-light: #E5E5EA;
+    --bg-gray-dark: #B8B8B8;
+    --bg-message-in: #FFFFFF;
+    --bg-message-out: #007AFF;
+    --text-main: #1C1C1E;
+    --text-sub: #8E8E93;
+    --accent-red: #E74C3C;
+    --accent-orange: #FF9800;
+    --radius-xl: 20px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+    --shadow-soft: 0 2px 12px rgba(0,0,0,0.06);
+    --shadow-video: 0 4px 20px rgba(0,0,0,0.15);
+    --anim-curve: cubic-bezier(0.25, 0.8, 0.25, 1);
+    --vh: 1vh;
+    
+    /* Elements */
+    --header-border: var(--bg-gray-light);
+    --back-btn-bg: var(--bg-gray-light);
+    --back-btn-active: var(--bg-gray-dark);
+    --avatar-gradient: linear-gradient(135deg, #FFB74D, #FF9800);
+    --video-call-bg: var(--bg-card);
+    --video-call-border: var(--bg-gray-light);
+    --task-bar-bg: var(--bg-card);
+    --task-bar-border: var(--bg-gray-light);
+    --task-btn-bg: var(--bg-gray-light);
+    --task-btn-active: #6F36D6;
+    --input-area-bg: var(--bg-card);
+    --input-area-border: var(--bg-gray-light);
+    --input-bg: var(--bg-gray-light);
+    --voice-btn-bg: var(--bg-gray-dark);
+    --send-btn-bg: var(--accent-orange);
+    --typing-bg: var(--bg-message-in);
+    --loading-gradient: linear-gradient(135deg, #FFB74D 0%, #FF9800 30%, #FFB74D 60%, #FF9800 100%);
+    --loader-color: #FFFFFF;
+    --call-dot-color: #2ecc71;
+    --end-call-bg: #E74C3C;
+    --video-bg: #000;
+    --badge-idle: rgba(102,126,234,0.9);
+    --badge-talking: rgba(231,76,60,0.9);
+    --badge-greeting: rgba(46,204,113,0.9);
+    --badge-thinking: rgba(155,89,182,0.9);
+}
+
+/* === DARK THEME === */
+[data-theme="dark"] {
+    --bg-app: #1C1C1E;
+    --bg-card: #2C2C2E;
+    --bg-gray-light: #3A3A3C;
+    --bg-gray-dark: #48484A;
+    --bg-message-in: #2C2C2E;
+    --bg-message-out: #0A84FF;
+    --text-main: #F5F5F7;
+    --text-sub: #AEAEB2;
+    --accent-red: #FF453A;
+    --accent-orange: #FF9F0A;
+    --shadow-soft: 0 2px 12px rgba(0,0,0,0.3);
+    --shadow-video: 0 4px 20px rgba(0,0,0,0.4);
+    
+    /* Elements */
+    --header-border: rgba(255,255,255,0.1);
+    --back-btn-bg: var(--bg-gray-light);
+    --back-btn-active: #5A5A5C;
+    --avatar-gradient: linear-gradient(135deg, #FF9F0A, #FF6B3D);
+    --video-call-bg: var(--bg-card);
+    --video-call-border: var(--bg-gray-light);
+    --task-bar-bg: var(--bg-card);
+    --task-bar-border: var(--bg-gray-light);
+    --task-btn-bg: var(--bg-gray-light);
+    --task-btn-active: #6F36D6;
+    --input-area-bg: var(--bg-card);
+    --input-area-border: var(--bg-gray-light);
+    --input-bg: var(--bg-gray-light);
+    --voice-btn-bg: var(--bg-gray-dark);
+    --send-btn-bg: var(--accent-orange);
+    --typing-bg: var(--bg-message-in);
+    --loading-gradient: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 30%, #1C1C1E 60%, #2C2C2E 100%);
+    --loader-color: #F5F5F7;
+    --call-dot-color: #30D158;
+    --end-call-bg: #FF453A;
+    --video-bg: #000;
+    --badge-idle: rgba(64,102,224,0.9);
+    --badge-talking: rgba(255,69,58,0.9);
+    --badge-greeting: rgba(48,209,88,0.9);
+    --badge-thinking: rgba(189,124,214,0.9);
+}
+
+/* === RESET & BASE === */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    font-family: Roboto, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    touch-action: manipulation;
+}
+
+body {
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+    min-height: -webkit-fill-available;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100vw;
+    margin: 0 auto;
+    position: relative;
+    transition: background-color 0.3s var(--anim-curve), color 0.3s var(--anim-curve);
+}
+
+/* Smooth transitions for theme change */
+.chat-header, .video-call-panel, .task-bar, .input-area,
+.back-btn, .video-call-btn, .task-btn, .message-bubble,
+.typing-indicator, .avatar-container, .call-status,
+.end-call-btn, .message-input,
+.voice-btn, .send-btn, .loading-screen {
+    transition: background-color 0.3s var(--anim-curve), 
+               border-color 0.3s var(--anim-curve),
+               box-shadow 0.3s var(--anim-curve),
+               color 0.3s var(--anim-curve);
+}
+
+/* === LOADING SCREEN === */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--loading-gradient);
+    background-size: 400% 400%;
+    animation: gradientShift 3s ease infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.4s ease, visibility 0.4s ease, background 0.3s var(--anim-curve);
+}
+
+.loader {
+  --color: var(--loader-color);
+  --size: 70px;
+  width: var(--size);
+  height: var(--size);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-bottom: 20px;
+}
+
+.loader span {
+  width: 100%;
+  height: 100%;
+  background-color: var(--color);
+  animation: keyframes-blink 0.6s alternate infinite linear;
+}
+
+.loader span:nth-child(1) { animation-delay: 0ms; }
+.loader span:nth-child(2) { animation-delay: 200ms; }
+.loader span:nth-child(3) { animation-delay: 300ms; }
+.loader span:nth-child(4) { animation-delay: 400ms; }
+.loader span:nth-child(5) { animation-delay: 500ms; }
+.loader span:nth-child(6) { animation-delay: 600ms; }
+
+@keyframes keyframes-blink {
+  0% { opacity: 0.3; transform: scale(0.5) rotate(5deg); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.loader-icon {
+    width: 80px;
+    height: 80px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 24px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader-text {
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.loader-progress {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+/* --- HEADER --- */
+.chat-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--header-border);
+    gap: 12px;
+    z-index: 50;
+    transition: background-color 0.3s var(--anim-curve), border-color 0.3s var(--anim-curve);
+}
+
+.back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--back-btn-bg);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.back-btn:active { background: var(--back-btn-active); }
+.back-btn svg { width: 20px; height: 20px; fill: var(--text-main); transition: fill 0.3s var(--anim-curve); }
+
+.avatar-container {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--avatar-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.3s var(--anim-curve);
+}
+.avatar-container svg { width: 24px; height: 24px; fill: white; }
+
+.chat-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.chat-title { font-size: 16px; font-weight: 600; color: var(--text-main); transition: color 0.3s var(--anim-curve); }
+.chat-status { font-size: 12px; color: var(--text-sub); margin-top: 2px; transition: color 0.3s var(--anim-curve); }
+
+.video-call-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--back-btn-bg); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.2s;
+}
+.video-call-btn:active { background: var(--back-btn-active); }
+.video-call-btn svg { width: 20px; height: 20px; fill: var(--text-main); transition: fill 0.3s var(--anim-curve); }
+.video-call-btn.active { background: var(--accent-red); }
+.video-call-btn.active svg { fill: white; }
+
+/* === VIDEO CALL PANEL === */
+.video-call-panel {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-110%);
+    width: 100%;
+    max-width: 414px;
+    background: var(--video-call-bg);
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    box-shadow: var(--shadow-video);
+    z-index: 100;
+    transition: transform 0.4s var(--anim-curve), background-color 0.3s var(--anim-curve);
+    padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    margin-top: 10px;
+}
+
+.video-call-panel.active {
+    transform: translateX(-50%) translateY(0);
+}
+
+.video-call-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--video-call-border);
+    transition: border-color 0.3s var(--anim-curve);
+}
+
+.call-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-sub);
+    transition: color 0.3s var(--anim-curve);
+}
+
+.call-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--call-dot-color);
+    animation: pulse 2s infinite;
+    transition: background-color 0.3s var(--anim-curve);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.9); }
+}
+
+.end-call-btn {
+    background: var(--end-call-bg);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, background-color 0.3s var(--anim-curve);
+}
+.end-call-btn:active { opacity: 0.9; }
+
+/* Video container 16:9 */
+.avatar-video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background: var(--video-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: background-color 0.3s var(--anim-curve);
+}
+
+.avatar-video-container video {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+.avatar-video-container video.inactive { opacity: 0; pointer-events: none; }
+.avatar-video-container video.active { opacity: 1; }
+
+/* === TASK BAR === */
+.task-bar {
+    background: var(--task-bar-bg);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--task-bar-border);
+    transition: opacity 0.3s, max-height 0.3s, background-color 0.3s var(--anim-curve), border-color 0.3s var(--anim-curve);
+}
+.task-bar.hidden {
+    opacity: 0;
+    max-height: 0;
+    padding: 0 16px;
+    border-bottom: none;
+    pointer-events: none;
+}
+.task-scroll {
+    display: flex; gap: 10px; overflow-x: auto;
+    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; padding-bottom: 4px;
+}
+.task-scroll::-webkit-scrollbar { display: none; }
+/* Стили для контейнера иконки внутри кнопки */
+.task-icon {
+    width: 20px; /* Фиксированный размер */
+    height: 20px;
+    margin-right: 8px; /* Отступ от текста */
+    vertical-align: middle;
+    transition: filter 0.2s ease; /* Плавная смена цвета */
+    
+    /* По умолчанию иконка черная (исходный файл) */
+    filter: brightness(0); /* Делаем полностью черной, если файл серый */
+    /* ИЛИ, если файл уже чисто черный, оставь filter: none; */
+}
+
+/* Если исходная картинка черная, то для активной кнопки делаем её белой */
+.task-btn.active .task-icon {
+    filter: brightness(0) invert(1); 
+    /* brightness(0) -> делает черным, invert(1) -> инвертирует в белый */
+    /* Если картинка цветная, используй просто: filter: invert(1); */
+}
+
+/* Обновленные стили самой кнопки для выравнивания */
+.task-btn {
+    display: flex; /* Чтобы картинка и текст были в ряд */
+    align-items: center;
+    justify-content: center;
+    
+    /* Остальные твои стили */
+    flex-shrink: 0; 
+    padding: 10px 16px;
+    background: var(--task-btn-bg); 
+    border: none;
+    border-radius: var(--radius-xl); 
+    font-size: 13px;
+    font-weight: 500; 
+    color: var(--text-main);
+    cursor: pointer; 
+    scroll-snap-align: start;
+    transition: all 0.2s; 
+    white-space: nowrap;
+/*    width: ;*/
+}
+
+.task-btn:active { 
+    background: var(--bg-gray-dark); 
+    color: white; 
+}
+
+.task-btn.active { 
+    background: var(--task-btn-active); 
+    color: white; 
+}
+
+/* Убедимся, что текст тоже белый в активной кнопке */
+.task-btn.active span {
+    color: white;
+}
+
+.task-btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* === MESSAGES AREA === */
+.messages-container {
+    flex: 1; overflow-y: auto; padding: 16px 16px 16px 16px;
+    display: flex; flex-direction: column; gap: 12px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    background-image: url("../assets/icons/wallpaper_light.png");
+    background-color: #ffefd7; /* Цвет, который хотим подмешать */
+    background-blend-mode: multiply;
+    background-size: cover;
+}
+}
+.message {
+    display: flex; flex-direction: column;
+    max-width: 75%; animation: messageIn 0.3s var(--anim-curve);
+}
+@keyframes messageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.message.incoming { align-self: flex-start; }
+.message.outgoing { align-self: flex-end; align-items: flex-end; }
+.message-bubble {
+    padding: 12px 16px; border-radius: var(--radius-xl);
+    font-size: 16px; line-height: 1.4;
+    box-shadow: var(--shadow-soft); word-wrap: break-word;
+    transition: background-color 0.3s var(--anim-curve), color 0.3s var(--anim-curve);
+}
+.message.incoming .message-bubble {
+    background: var(--bg-message-in);
+    border-bottom-left-radius: 4px; color: var(--text-main);
+    max-width: 75%;
+}
+.message.outgoing .message-bubble {
+    background: var(--bg-message-out);
+    border-bottom-right-radius: 4px; color: white;
+}
+.message-time {
+    font-size: 11px; color: var(--text-sub);
+    margin-top: 4px; padding: 0 4px;
+    transition: color 0.3s var(--anim-curve);
+}
+
+
+
+/************************************************************
+/* Кликабельный текст от аватара */
+.ai-text {
+    cursor: pointer;
+    transition: background-color 0.2s, border-radius 0.2s;
+    display: inline-block;
+    padding: 2px 4px;
+    margin: -2px -4px; /* Компенсируем паддинг */
+    border-radius: 4px;
+}
+
+.ai-text:hover {
+    background-color: rgba(255, 152, 0, 0.1);
+}
+
+.ai-text.active {
+    background-color: rgba(255, 152, 0, 0.2);
+    font-weight: 500;
+}
+
+/* Контейнер для разбивки фраз */
+.phrase-breakdown .phrase-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.phrase-breakdown .phrase-chunk {
+    background: rgba(10, 132, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.phrase-breakdown .phrase-separator {
+    color: var(--text-sub);
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+/* Отображение пиньиня */
+.pinyin-display {
+    font-size: 13px;
+    color: var(--accent-blue);
+    font-family: monospace;
+    background: rgba(10, 132, 255, 0.05);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent-blue);
+}
+
+/* Адаптация существующего explanation-content */
+.explanation-content {
+    margin-top: 10px;
+    animation: fadeIn 0.3s ease;
+    border-top: 1px solid var(--bg-gray-light);
+    padding-top: 10px;
+}
+
+/* Если explanation-content используется и для feedback, и для phrase-breakdown */
+.explanation-content:not(.phrase-breakdown) .explanation-divider {
+    height: 2px;
+    width: 100%;
+    margin-bottom: 8px;
+    border-radius: 2px;
+}
+
+.explanation-text {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* === Кликабельный текст аватара === */
+.ai-text {
+    cursor: pointer;
+    transition: background 0.2s, border-radius 0.2s;
+    display: inline-block;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    border-radius: 4px;
+}
+.ai-text:hover { background: rgba(255,152,0,0.15); border-radius: 10px;}
+.ai-text.active { background: rgba(255, 185, 81, 0.25); font-weight: 500; border-radius: 10px; font-family: Noto Sans SC Black; color: #ff9800;;}
+
+/* === Попап перевода === */
+.translation-popup  {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--bg-secondary, #f8f9fa);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-blue, #A4A4A4);
+  animation: fadeIn 0.25s ease;
+  font-size: 13px;
+}
+.translation-popup.loading { color: var(--text-sub); font-style: italic; }
+.pinyin-row { color: var(--accent-blue); font-family: monospace; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.translation-row { color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+.warning-row { color: #E74C3C; font-size: 12px; margin-top: 4px; }
+
+/* === Кнопка "?" === */
+.explain {
+    position: absolute;
+    bottom: 6px; right: 8px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #a2a2a2; color: white;
+    font-weight: bold; font-size: 13px;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+    z-index: 2;
+}
+.explain:hover { transform: scale(1.1); background: #FF9800; }
+.explain.process {
+    background: transparent;
+    animation: pulseBorder 1.5s linear infinite;
+}
+@keyframes pulseBorder {
+    0% { box-shadow: 0 0 0 0 rgba(255,152,0,0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(255,152,0,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,152,0,0); }
+}
+
+/* === Пояснение (feedback) === */
+.explanation-content {
+  border-top-width: 0px;
+  border-top-style: solid;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--bg-secondary, #f8f9fa);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-blue, #25D600);
+  animation: fadeIn 0.25s ease;
+  font-size: 13px;
+}
+
+.message-text {
+    font-family: Noto Sans SC Medium;
+}
+
+.explanation-divider { height: 2px; width: 100%; margin-bottom: 8px; border-radius: 2px; }
+.explanation-text { font-size: 13px; color: var(--text-sub); font-style: italic; line-height: 1.4; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/************************************************************
+
+
+/* Стили для кнопки объяснения */
+.explain {
+    position: relative; /* Важно для позиционирования бортика */
+    border-radius: 50% 5% 50% 5%;
+    background-color: #a2a2a2;
+    color: white;
+    font-weight: bold;
+    border: solid;
+    border-width: 3px;
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 93%;
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.3s;
+    z-index: 1; /* Чтобы текст был поверх бортика */
+    overflow: hidden; /* Обрезаем лишнее, если нужно */
+}
+
+.explain:hover {
+    transform: scale(1.1);
+}
+
+.explain.hidden {
+    display: none;
+}
+
+/* Стиль "process" - анимированный бортик */
+.explain.process {
+    background-color: transparent; /* Делаем фон прозрачным, чтобы видеть бортик */
+    color: transparent; /* Скрываем вопросительный знак во время процесса (опционально) */
+}
+
+/* Создаем вращающийся градиентный бортик */
+.explain.process::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg, 
+        #ff0000, 
+        #ffff00
+    );
+    animation: rotateBorder 1.5s linear infinite;
+    z-index: -1; /* Помещаем под кнопку */
+}
+
+/* Внутренний круг, чтобы перекрыть центр градиента и оставить только бортик */
+.explain.process::after {
+    content: '?'; /* Возвращаем знак вопроса */
+    position: absolute;
+    top: 2px; /* Компенсируем border */
+    left: 2px;
+    width: 20px; /* width кнопки (24) - 2*2px border */
+    height: 20px;
+    background-color: #a2a2a2; /* Цвет фона кнопки */
+    border-radius: 50% 5% 50% 5%; /* Та же форма, что у кнопки */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    z-index: -1; /* Под текстом, но над градиентом */
+}
+
+/* Анимация вращения */
+@keyframes rotateBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Остальные стили без изменений */
+.explanation-content {
+    margin-top: 12px;
+    animation: fadeIn 0.3s ease;
+}
+
+.explanation-divider {
+    height: 2px;
+    width: 100%;
+    margin-bottom: 8px;
+    border-radius: 2px;
+}
+
+.explanation-text {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === MASKED MESSAGE === */
+.message.incoming.masked .message-bubble {
+    position: relative;
+    overflow: hidden;
+    filter: blur(2px);
+    user-select: none;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+    min-height: 24px;
+}
+.message.incoming.masked .message-bubble:hover { filter: blur(2px); }
+.message.incoming.masked.revealed .message-bubble { filter: none; cursor: default; }
+.message.incoming.masked { animation: messageMaskedIn 0.4s var(--anim-curve); }
+@keyframes messageMaskedIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* === INPUT AREA === */
+.input-area {
+    background: var(--input-area-bg); padding: 12px 16px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--input-area-border);
+    display: flex; align-items: center; gap: 10px;
+    transition: background-color 0.3s var(--anim-curve), border-color 0.3s var(--anim-curve);
+}
+.message-input {
+    flex: 1; background: var(--input-bg); border: none;
+    border-radius: var(--radius-xl); padding: 12px 16px;
+    font-size: 15px; color: var(--text-main); outline: none;
+    resize: none; max-height: 100px; min-height: 44px;
+    font-family: inherit;
+    transition: background-color 0.3s var(--anim-curve), color 0.3s var(--anim-curve);
+}
+
+.message-input.hidden {
+    display: none;
+}
+
+.message-input::placeholder { color: var(--text-sub); transition: color 0.3s var(--anim-curve); }
+.message-input:disabled { opacity: 0.6; }
+.voice-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--voice-btn-bg); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: transform 0.2s, background-color 0.3s var(--anim-curve);
+}
+.voice-btn.hidden {
+    display: none;
+}
+.voice-btn:active { transform: scale(0.9); }
+.voice-btn.open {
+    width: 100%;
+    border-radius: 20px;
+}
+.voice-btn svg { width: 20px; height: 20px; fill: white; }
+.send-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--send-btn-bg); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: transform 0.2s, background-color 0.3s var(--anim-curve);
+    display: none;
+}
+.send-btn.visible { display: flex; }
+.send-btn:active { transform: scale(0.9); }
+.send-btn svg { width: 20px; height: 20px; fill: white; margin-left: 2px; }
+
+/* === TYPING INDICATOR === */
+.typing-indicator {
+    display: flex; gap: 4px; padding: 12px 16px;
+    background: var(--typing-bg); border-radius: var(--radius-xl);
+    border-bottom-left-radius: 4px; width: fit-content;
+    box-shadow: var(--shadow-soft);
+    transition: background-color 0.3s var(--anim-curve);
+}
+.typing-dot {
+    width: 8px; height: 8px; background: var(--text-sub);
+    border-radius: 50%; animation: typingBounce 1.4s infinite ease-in-out;
+    transition: background-color 0.3s var(--anim-curve);
+}
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+}
+
+/* === XP PROGRESS BAR in Header === */
+.xp-progress-container {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Отступ между элементами */
+    width: 100%; /* Занимает всю ширину chat-info */
+    box-sizing: border-box; /* Включаем padding в ширину */
+}
+
+.xp-label {
+    display: none;
+    font-size: 11px; /* Меньший размер шрифта */
+    color: var(--text-sub); /* Цвет как у подзаголовка */
+    white-space: nowrap; /* Не переносить текст */
+}
+
+.xp-progress-bar {
+    flex: 1; /* Занимает оставшееся место */
+    height: 10px; /* Высота полоски */
+    background: var(--bg-gray-light); /* Фон полоски */
+    overflow: hidden; /* Обрезаем заливку за границы */
+    position: relative; /* Для позиционирования fill */
+}
+
+.xp-progress-fill {
+    height: 100%;
+    width: 0%; /* Начинаем с 0% */
+    background: linear-gradient(90deg, #FF9800, #FF5722); /* Градиент от orange к red */
+    transition: width 0.5s ease-in-out; /* Плавный переход ширины */
+}
+
+.xp-amount {
+    display: none;
+    font-size: 11px; /* Меньший размер шрифта */
+    color: var(--text-main); /* Цвет текста */
+    white-space: nowrap; /* Не переносить текст */
+    margin-left: 6px; /* Отступ от полоски */
+    min-width: 40px; /* Минимальная ширина для стабильности */
+    text-align: right; /* Выравнивание числа по правому краю */
+}
+
+/* === DARK THEME для XP Progress Bar === */
+[data-theme="dark"] .xp-progress-bar {
+    background: var(--bg-gray-dark); /* Темный фон полоски */
+}
+
+/* Градиент можно оставить, он обычно хорошо смотрится в обоих темах */
+/* [data-theme="dark"] .xp-progress-fill { ... } - можно не менять */

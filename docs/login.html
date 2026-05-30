@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Вход — AI Chinese</title>
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --bg-app: #F2F2F7;
+            --bg-card: #FFFFFF;
+            --bg-gray-light: #E5E5EA;
+            --bg-gray-dark: #B8B8B8;
+            --bg-input: #F5F5F7;
+            --text-main: #1C1C1E;
+            --text-sub: #8E8E93;
+            --accent-blue: #0A84FF;
+            --accent-orange: #FF9800;
+            --accent-red: #E74C3C;
+            --radius-xl: 20px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --shadow-soft: 0 2px 12px rgba(0,0,0,0.06);
+            --shadow-medium: 0 4px 24px rgba(0,0,0,0.1);
+            --anim-curve: cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: PTSans-Regular, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+        }
+
+        /* --- ANIMATED GEOMETRIC BACKGROUND --- */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: linear-gradient(135deg, #F2F2F7 0%, #E8E8ED 100%);
+        }
+
+        .geo-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+            animation: float 20s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .geo-shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-orange));
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+            animation-duration: 25s;
+        }
+
+        .geo-shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, var(--accent-orange), #FF5722);
+            bottom: -50px;
+            left: -50px;
+            animation-delay: -5s;
+            animation-duration: 18s;
+        }
+
+        .geo-shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--accent-blue), #5E35B1);
+            top: 50%;
+            left: 10%;
+            animation-delay: -10s;
+            animation-duration: 22s;
+        }
+
+        .geo-shape:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #66BB6A, var(--accent-blue));
+            bottom: 20%;
+            right: 15%;
+            animation-delay: -15s;
+            animation-duration: 20s;
+        }
+
+        .geo-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(28,28,30,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(28,28,30,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 30s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            25% { transform: translate(20px, -20px) rotate(90deg) scale(1.05); }
+            50% { transform: translate(-10px, 20px) rotate(180deg) scale(0.95); }
+            75% { transform: translate(-20px, -10px) rotate(270deg) scale(1.02); }
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* --- AUTH CARD --- */
+        .auth-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 32px 28px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-medium);
+            animation: cardEnter 0.4s var(--anim-curve);
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* --- LOGO & HEADER --- */
+        .auth-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .app-logo {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-orange));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .app-logo svg {
+            width: 36px;
+            height: 36px;
+            fill: white;
+        }
+
+        .app-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        /* --- FORM --- */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-blue);
+            background: var(--bg-card);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-sub);
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-blue);
+            cursor: pointer;
+        }
+
+        .remember-me span {
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .forgot-link {
+            font-size: 13px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .forgot-link:hover {
+            opacity: 0.8;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ffc400, #FF9800);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(10, 132, 255, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(10, 132, 255, 0.2);
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 2px solid var(--bg-gray-light);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .btn-google:hover {
+            background: var(--bg-input);
+            border-color: var(--bg-gray-dark);
+        }
+
+        .btn-google svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* --- DIVIDER --- */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+            color: var(--text-sub);
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--bg-gray-light);
+        }
+
+        /* --- FOOTER --- */
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        .auth-footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- INPUT ICONS --- */
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            fill: var(--text-sub);
+            pointer-events: none;
+        }
+
+        .form-input.with-icon {
+            padding-left: 42px;
+        }
+
+        /* --- ERROR STATE --- */
+        .form-input.error {
+            border-color: var(--accent-red);
+            background: #FFF5F5;
+        }
+
+        .error-text {
+            font-size: 12px;
+            color: var(--accent-red);
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-text.visible {
+            display: block;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-height: 700px) {
+            .auth-card {
+                padding: 24px 24px;
+                margin: 12px;
+            }
+            .auth-header {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* --- ANIMATIONS FOR INTERACTIONS --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        /* --- GOOGLE BUTTON ICON COLORS --- */
+        .google-icon {
+            display: inline-flex;
+        }
+        .google-icon .red { fill: #EA4335; }
+        .google-icon .blue { fill: #4285F4; }
+        .google-icon .yellow { fill: #FBBC05; }
+        .google-icon .green { fill: #34A853; }
+
+        /* === 🍞 TOAST NOTIFICATIONS === */
+        .toast-container {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none; /* Чтобы тосты не блокировали клики */
+            width: 100%;
+            max-width: 414px;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+
+        .toast {
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 360px;
+            min-height: 56px;
+            padding: 12px 14px;
+            background: var(--bg-card, #FFFFFF);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--accent-orange);
+            animation: toastSlideIn 0.3s var(--anim-curve), toastFadeOut 0.3s ease forwards 4.7s;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .toast:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent-green, #34C759);
+        }
+
+        .toast.error {
+            border-left-color: var(--accent-red, #E74C3C);
+        }
+
+        .toast.warning {
+            border-left-color: #FF9800;
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-icon {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.05);
+        }
+
+        .toast-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .toast.success .toast-icon {
+            background: rgba(52, 199, 89, 0.15);
+            color: var(--accent-green);
+        }
+
+        .toast.error .toast-icon {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--accent-red);
+        }
+
+        .toast.warning .toast-icon {
+            background: rgba(255, 152, 0, 0.15);
+            color: #FF9800;
+        }
+
+        .toast-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .toast-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .toast-desc {
+            font-size: 11px;
+            color: var(--text-sub);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .toast-close {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-sub);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .toast-close:hover {
+            background: rgba(0,0,0,0.08);
+            color: var(--text-main);
+        }
+
+        .toast-close svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Анимации */
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes toastFadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+                pointer-events: none;
+            }
+        }
+
+        /* Тёмная тема */
+        [data-theme="dark"] .toast {
+            background: var(--bg-card, #2C2C2E);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        [data-theme="dark"] .toast-icon {
+            background: rgba(255,255,255,0.1);
+        }
+
+        [data-theme="dark"] .toast-close:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 375px) {
+            .toast {
+                min-height: 52px;
+                padding: 10px 12px;
+            }
+            .toast-title {
+                font-size: 12px;
+            }
+            .toast-desc {
+                font-size: 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="geo-shape"></div>
+        <div class="geo-shape"></div>
+        <div class="geo-shape"></div>
+        <div class="geo-shape"></div>
+        <div class="geo-grid"></div>
+    </div>
+
+    <!-- Auth Card -->
+    <main class="auth-card">
+        
+        <!-- Header -->
+        <header class="auth-header">
+            <!-- <div class="app-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+            </div> -->
+            <img src="assets/icons/and_logo.png" class="app-logo">
+            <h1 class="app-title">Suesinim</h1>
+            <p class="app-subtitle">Изучение китайского с AI</p>
+        </header>
+
+        <!-- Form -->
+        <form id="authForm" novalidate>
+            
+            <!-- Email/Phone/Username Input -->
+            <div class="form-group">
+                <label class="form-label" for="login">Email, телефон или имя</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    <input 
+                        type="text" 
+                        class="form-input with-icon" 
+                        id="login"
+                        placeholder="mail, phone or username"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+                <span class="error-text" id="loginError">Введите корректные данные</span>
+            </div>
+
+            <!-- Password Input -->
+            <div class="form-group">
+                <label class="form-label" for="password">Пароль</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" viewBox="0 0 24 24">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                    </svg>
+                    <input 
+                        type="password" 
+                        class="form-input with-icon" 
+                        id="password"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                        required
+                        minlength="6"
+                    >
+                </div>
+                <span class="error-text" id="passwordError">Минимум 6 символов</span>
+            </div>
+
+            <!-- Remember & Forgot -->
+            <div class="form-row">
+                <label class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <span>Запомнить меня</span>
+                </label>
+                <a href="#" class="forgot-link" id="forgotLink">Забыли пароль?</a>
+            </div>
+
+            <!-- Sign In Button -->
+            <button type="submit" class="btn-primary" id="signInBtn">
+                Войти в аккаунт
+            </button>
+
+        </form>
+
+        <!-- Divider -->
+        <div class="divider">или</div>
+
+        <!-- Google Sign In -->
+        <button class="btn-google" id="googleBtn">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path class="yellow" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path class="green" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path class="red" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path class="blue" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Войти через Google
+        </button>
+
+        <!-- Footer -->
+        <footer class="auth-footer">
+            Нет аккаунта? <a href="register.html">Зарегистрироваться</a>
+        </footer>
+
+    </main>
+
+    <script src="./js/client.js"></script>
+
+    <script> 
+
+        const form = document.getElementById('authForm');
+        const loginInput = document.getElementById('login');
+        const passwordInput = document.getElementById('password');
+        const loginError = document.getElementById('loginError');
+        const passwordError = document.getElementById('passwordError');
+        const signInBtn = document.getElementById('signInBtn');
+        const googleBtn = document.getElementById('googleBtn');
+        const forgotLink = document.getElementById('forgotLink');
+        const host = window.API_HOST;
+
+        console.log(host);
+
+
+        /**
+         * Показывает красивое уведомление (toast)
+         * @param {'success'|'error'|'warning'} type - Тип уведомления
+         * @param {string} title - Заголовок
+         * @param {string} [description] - Описание (опционально)
+         * @param {number} [duration=5000] - Время показа в мс
+         */
+        function showToast(type, title, description = '', duration = 5000) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            // Иконки для разных типов
+            const icons = {
+                success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>`,
+                error: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+                warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.setAttribute('role', 'alert');
+            
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <div class="toast-icon">${icons[type] || icons.warning}</div>
+                    <div class="toast-text">
+                        <span class="toast-title">${title}</span>
+                        ${description ? `<span class="toast-desc">${description}</span>` : ''}
+                    </div>
+                </div>
+                <button class="toast-close" aria-label="Закрыть">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            `;
+
+            // Кнопка закрытия
+            const closeBtn = toast.querySelector('.toast-close');
+            const removeToast = () => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                setTimeout(() => toast.remove(), 200);
+            };
+            
+            closeBtn.addEventListener('click', removeToast);
+            
+            // Закрытие по тапу на тост (опционально)
+            toast.addEventListener('click', (e) => {
+                if (e.target === toast || e.target === closeBtn) removeToast();
+            });
+
+            // Авто-удаление
+            if (duration > 0) {
+                setTimeout(removeToast, duration);
+            }
+
+            container.appendChild(toast);
+            
+            // Ограничение: не больше 3 тостов одновременно
+            const toasts = container.querySelectorAll('.toast');
+            if (toasts.length > 3) {
+                toasts[0].remove();
+            }
+        }
+
+
+        // Validation helpers
+        function isValidLogin(value) {
+            // Email
+            if (value.includes('@')) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+            }
+            // Phone (basic international format)
+            if (/^[\d+\s()-]+$/.test(value)) {
+                return value.replace(/\D/g, '').length >= 10;
+            }
+            // Username (alphanumeric, 3-20 chars)
+            return /^[a-zA-Z0-9_]{3,20}$/.test(value);
+        }
+
+        // Real-time validation
+        loginInput.addEventListener('blur', () => {
+            if (loginInput.value && !isValidLogin(loginInput.value)) {
+                loginInput.classList.add('error');
+                loginError.classList.add('visible');
+            } else {
+                loginInput.classList.remove('error');
+                loginError.classList.remove('visible');
+            }
+        });
+
+        passwordInput.addEventListener('blur', () => {
+            if (passwordInput.value && passwordInput.value.length < 6) {
+                passwordInput.classList.add('error');
+                passwordError.classList.add('visible');
+            } else {
+                passwordInput.classList.remove('error');
+                passwordError.classList.remove('visible');
+            }
+        });
+
+        // Clear error on input
+        loginInput.addEventListener('input', () => {
+            loginInput.classList.remove('error');
+            loginError.classList.remove('visible');
+        });
+        passwordInput.addEventListener('input', () => {
+            passwordInput.classList.remove('error');
+            passwordError.classList.remove('visible');
+        });
+
+        // Form submit
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            let hasError = false;
+            // ... (твоя валидация) ...
+            
+            if (!hasError) {
+                const loginData = {
+                    login: loginInput.value.trim(),
+                    password: passwordInput.value
+                };
+
+                signInBtn.textContent = 'Вход...';
+                signInBtn.disabled = true;
+                
+                try {
+                    const response = await fetch(`http://${host}:8002/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(loginData)
+                    });
+
+                    console.log(response);
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        // сохраняем id пользователя в localStorage, чтобы помнить, кто вошел
+                        localStorage.setItem('currentUserId', result.user_id);
+                        localStorage.setItem('userSettings', JSON.stringify(result.profile)); // можно сохранить настройки
+                        
+                        showToast('success', 'Вход выполнен', 'Добро пожаловать в AI Chinese!');
+
+                        // Через 1 секунду — редирект
+                        setTimeout(() => {
+                            window.location.href = 'test.html';
+                        }, 1000);
+                    } else {
+                        showToast('error', 'Ошибка входа', 'Неверный логин или пароль');
+                        signInBtn.textContent = 'войти в аккаунт';
+                        signInBtn.disabled = false;
+                    }
+                } catch (err) {
+                    showToast('error', 'Ошибка соединения', 'Проверьте интернет и попробуйте снова');
+                    signInBtn.textContent = 'войти в аккаунт';
+                    signInBtn.disabled = false;
+                }
+            }
+        });
+
+        // Google sign in (placeholder)
+        googleBtn.addEventListener('click', () => {
+            googleBtn.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                googleBtn.style.transform = 'scale(1)';
+                // Here would be Google OAuth flow
+                showToast('error', 'Google', 'Переход на вторизацию');
+            }, 150);
+        });
+
+        // Forgot password
+        forgotLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showToast('error', 'Break', 'Сброс пароля');
+        });
+
+        // Smooth entrance animation delay for elements
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('.form-input');
+            inputs.forEach((input, index) => {
+                input.style.animation = `cardEnter 0.3s var(--anim-curve) ${index * 0.1 + 0.2}s both`;
+            });
+            // console.log(host);
+        });
+    </script>
+
+    <!-- === 🍞 TOAST NOTIFICATIONS CONTAINER === -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+</body>
+</html>
