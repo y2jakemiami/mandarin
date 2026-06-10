@@ -71,7 +71,8 @@
 </div>
 
 <div align="center">
-  <img src="docs/screenshots/desktop_chat.png" alt="Интерфейс чата с ИИ-аватаром на десктопе" width="800">
+  <img src="docs/screenshots/desktop_chat1.png" alt="Интерфейс чата с ИИ-аватаром на десктопе" width="800">
+  <img src="docs/screenshots/desktop_chat2.png" alt="Интерфейс чата с ИИ-аватаром на десктопе" width="800">
   <p><i>Интерфейс чата с ИИ-аватаром на десктопе</i></p>
 </div>
 
@@ -87,7 +88,8 @@
 
 ### 🌐 Презентационный сайт стартапа
 <div align="center">
-  <img src="docs/screenshots/landing_page.png" alt="Главная страница сайта стартап-проекта" width="800">
+  <img src="docs/screenshots/landing_page1.png" alt="Главная страница сайта стартап-проекта" width="800">
+  <img src="docs/screenshots/landing_page2.png" alt="Главная страница сайта стартап-проекта" width="800">
   <p><i>Главная страница сайта стартап-проекта</i></p>
   
   <br>
