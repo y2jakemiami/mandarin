@@ -11,7 +11,7 @@
 [![Nginx](https://img.shields.io/badge/Nginx-1.24-009639.svg?logo=nginx&logoColor=white)](https://nginx.org/)
 [![Status](https://img.shields.io/badge/status-active-success.svg)](https://mandarin-ai-learn.ru)
 
-[️🔗 mandarin-ai-learn.ru](https://mandarin-ai-learn.ru)
+# [️🔗 mandarin-ai-learn.ru](https://mandarin-ai-learn.ru)
 
 </div>
 
@@ -66,24 +66,16 @@
 
 <details>
 <summary><b>📊 Нажмите, чтобы развернуть схему пользовательских сценариев (Рисунок 1)</b></summary>
-<br>
-<div align="center">
-  <img src="docs/screenshots/user_flow.png" alt="Схема пользовательских сценариев взаимодействия с PWA" width="800">
-  <p><i>Рисунок 1 – Схема пользовательских сценариев взаимодействия с PWA</i></p>
-</div>
-</details>
-
-<br>
 
 ### 💬 Интерфейс диалога с ИИ-аватаром
 <div align="center">
   <img src="docs/screenshots/chat_modes.png" alt="Режимы диалога: без аватара, с аватаром, анализ картинки" width="800">
-  <p><i>Рисунок 2 – Режимы диалога: а) Без аватара, б) С аватаром, в) Режим описания картинки</i></p>
+  <p><i>Режимы диалога: без аватара, с аватаром, анализ картинки</i></p>
 </div>
 
 <div align="center">
   <img src="docs/screenshots/desktop_chat.png" alt="Интерфейс чата с ИИ-аватаром на десктопе" width="800">
-  <p><i>Рисунок 3 – Скриншот интерфейса чата с ИИ-аватаром на десктопе</i></p>
+  <p><i>Интерфейс чата с ИИ-аватаром на десктопе</i></p>
 </div>
 
 <br>
@@ -91,7 +83,7 @@
 ### 📱 PWA-приложение на мобильных устройствах
 <div align="center">
   <img src="docs/screenshots/pwa_screens.png" alt="Интерфейс PWA: достижения, чаты по HSKK, профиль" width="800">
-  <p><i>Рисунок 4 – Интерфейс PWA: а) Окно достижений, б) Окно чатов по уровню HSKK, в) Окно профиля</i></p>
+  <p><i>Интерфейс PWA: достижения, чаты по HSKK, профиль</i></p>
 </div>
 
 <br>
@@ -99,15 +91,13 @@
 ### 🌐 Презентационный сайт стартапа
 <div align="center">
   <img src="docs/screenshots/landing_page.png" alt="Главная страница сайта стартап-проекта" width="800">
-  <p><i>Рисунок 5 – Скриншот главной страницы сайта стартап-проекта</i></p>
+  <p><i>Главная страница сайта стартап-проекта</i></p>
   
   <br>
   
   <img src="docs/screenshots/auth_and_hsk.png" alt="Авторизация и тестирование HSKK" width="800">
-  <p><i>Рисунок 6 – а) Окно авторизации; б) Окно входного тестирования уровня HSKK; в) Окно выбора тем</i></p>
+  <p><i>Авторизация и тестирование HSKK</i></p>
 </div>
-
----
 
 ---
 
