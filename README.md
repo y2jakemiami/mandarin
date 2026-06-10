@@ -11,7 +11,7 @@
 [![Nginx](https://img.shields.io/badge/Nginx-1.24-009639.svg?logo=nginx&logoColor=white)](https://nginx.org/)
 [![Status](https://img.shields.io/badge/status-active-success.svg)](https://mandarin-ai-learn.ru)
 
-[🌐 Демо](https://mandarin-ai-learn.ru) • [📖 Документация API](https://mandarin-ai-learn.ru/docs) • [🐛 Баг-репорт](../../issues) • [💡 Предложения](../../issues)
+[️🔗 mandarin-ai-learn.ru](https://mandarin-ai-learn.ru)
 
 </div>
 
